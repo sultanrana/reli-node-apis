@@ -1,8 +1,6 @@
 import * as dotenv from 'dotenv';
 
 dotenv.config({ path: '.env' });
-//const BASE_IMAGE_URL = "https://appcrates.net:"+process.env.PORT;
-//const ROUTE_IMAGE_PATH = "dist/uploads/images" //FOR BUILD
 
 const BASE_IMAGE_URL = "http://localhost:6262";
 const ROUTE_IMAGE_PATH = "src/uploads/images"; //FOR DEV
@@ -23,9 +21,9 @@ export const devConfig = {
     },
     email: {
         SERVICE: 'Gmail',
-        USER: 'qa.appcrates@gmail.com',
-        PASSOWRD: 'tkfnqrfxigmiulht',
-        FROM: 'qa.appcrates@gmail.com',
+        USER: 'farhatbaig77@gmail.com',
+        PASSOWRD: 'asusfjdtbvcccpsc',
+        FROM: 'farhatbaig77@gmail.com',
     },
 
 }

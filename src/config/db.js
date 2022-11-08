@@ -10,8 +10,8 @@ export const configureDb = () => {
     mongoose.Promise = global.Promise;
     mongoose
         .connect(
-            // `mongodb+srv://${devConfig.db_username}:${devConfig.db_password}@${devConfig.db_host}/${devConfig.db_name}?retryWrites=true&w=majority`,
-            `mongodb://localhost/${devConfig.db_name}`,
+            `mongodb+srv://${devConfig.db_username}:${devConfig.db_password}@${devConfig.db_host}/${devConfig.db_name}?retryWrites=true&w=majority`,
+            // `mongodb://localhost/${devConfig.db_name}`,
             {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,

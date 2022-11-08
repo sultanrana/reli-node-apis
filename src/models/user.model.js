@@ -3,39 +3,91 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 const UserSchema = new Schema({
     email: {
-      type: String,
+    type: String,
+    required: true,
+    lowercase: true
     },
     profileImage: {
       type: String,
+      default: null
+    },
+    firstName: {
+      type: String,
+      default: null
+    },
+    lastName: {
+      type: String,
+      default: null
+    },
+    userType: {
+      type: String,
+      default: null,
     },
     password: {
       type: String,
+      default: null
     },
-    profilePic: {
+    address: {
       type: String,
+      default: null
     },
-    gender: {
+    appartment: {
       type: String,
+      default: null
     },
-    country: {
+    willingRange: {
       type: String,
+      default: null
+    },
+    zipCode: {
+      type: String,
+      default: null
     },
     state: {
       type: String,
+      default: null
     },
     city: {
       type: String,
+      default: null
     },
-    skills: {
+    phoneNumber: {
       type: String,
-      enum: ['QA', 'Developer', 'BDE', 'HR', 'BA'],
+      default: null
     },
-    dateOfBirth : { 
-      type: Date 
-    }
+    otp: {
+      type: String,
+      default: "1234"
+    },
+    services: [
+        {
+            type: String,
+            default: null
+        }
+    ],
+    location: {
+        type: {
+            type: String,
+            default: 'Point',
+            enum: ['Point']
+        },
+        coordinates: {
+            type: [Number],
+            default: [0, 0]
+        }
+    },
+    statusBit: {
+      type: Boolean,
+      default: true
+    },
+    delBit: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
   );
 
+UserSchema.index({ location: '2dsphere' });
 
 export default mongoose.model('users', UserSchema);
