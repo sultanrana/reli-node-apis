@@ -147,4 +147,169 @@ async verifyOTP(req, res){
 },
 
 
+/////////// user crud /////////////////
+
+async listing(req, res) {
+    try {
+        await  UserModel.find({"userType": "admin"}, function(err, users) {
+            if (err) {
+                let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+                return res.status(INTERNAL_SERVER_ERROR).json(result)
+            } else {
+                let userRecord = [];
+                users.forEach((doc) => {
+                    userRecord.push({
+                        id: doc._id,
+                        firstName: doc.firstName,
+                        lastName: doc.lastName,
+                        email: doc.email,
+                        userType: doc.userType,
+                        statusBit: doc.statusBit
+                    });
+                });
+                let couponResponce = userRecord;
+                let result = makeApiResponce('User Listing', 1, OK, couponResponce);
+                return res.json(result);
+            }
+        })
+
+    }catch(err){
+        console.log(err);
+        let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+        return res.status(INTERNAL_SERVER_ERROR).json(result)
+    }
+},
+
+
+async add(req, res) {
+    try {
+
+        const randomOtp = await randomValueHex("6");
+
+        // VALIDATE THE REQUEST
+        // const {error, value} = userService.validateAddUserSchema(req.body);
+        // if(error && error.details){
+        //     let result = makeApiResponce(error.message, 0, BAD_REQUEST)
+        //     return res.status(BAD_REQUEST).json(result);
+        // }
+
+        const existingUser = await UserModel.findOne({ email: req.body.email });
+        if (existingUser) {
+            let result = makeApiResponce('Email is Already Exsit', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+        const user = new UserModel();
+
+        user.email = req.body.email;
+        user.firstName = req.body.firstName;
+        user.lastName = req.body.lastName;
+        user.userType = req.body.userType;
+        user.statusBit = req.body.statusBit;
+        user.otp = randomOtp;
+        const hash = await getEncryptedPassword('12345678');
+        user.password = hash;
+        await user.save();
+        let userResponce = {
+            id: user._id
+        }
+
+        let result = makeApiResponce('User Created Successfully', 1, OK, userResponce);
+        return res.json(result);
+
+    }catch(err){
+        console.log(err);
+        let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+        return res.status(INTERNAL_SERVER_ERROR).json(result)
+    }
+},
+
+
+async update(req, res) {
+    try {
+
+        const findUser = await UserModel.findById(req.params.id);
+        if (!findUser) {
+            let result = makeApiResponce('Coupon not found.', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+
+        // VALIDATE THE REQUEST
+        // const {error, value} = userService.validateUpdateUserSchema(req.body);
+        // if(error && error.details){
+        //     let result = makeApiResponce(error.message, 0, BAD_REQUEST)
+        //     return res.status(BAD_REQUEST).json(result);
+        // }
+        
+        findUser.firstName = req.body.firstName;
+        findUser.lastName = req.body.lastName;
+        findUser.userType = req.body.userType;
+        findUser.statusBit = req.body.statusBit;
+        await findUser.save();
+
+        let userResponce = {
+            id: findUser._id
+        }
+
+        let result = makeApiResponce('User updated successfully', 1, OK, userResponce);
+        return res.json(result);
+
+    }catch(err){
+        console.log(err);
+        let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+        return res.status(INTERNAL_SERVER_ERROR).json(result)
+    }
+},
+
+async detail(req, res) {
+    try {
+
+        const findUser = await UserModel.findById(req.params.id);
+        if (!findUser) {
+            let result = makeApiResponce('User not found.', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+        let userResponce = {
+            id: findUser._id,
+            firstName: findUser.firstName,
+            lastName: findUser.lastName,
+            email: findUser.email,
+            userType: findUser.userType,
+            statusBit: findUser.statusBit
+        }
+        let result = makeApiResponce('User Detail', 1, OK, userResponce);
+        return res.json(result);
+
+    }catch(err){
+        console.log(err);
+        let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+        return res.status(INTERNAL_SERVER_ERROR).json(result)
+    }
+},
+
+async delete(req, res) {
+    try {
+        const findUser = await UserModel.findById(req.params.id);
+        if (!findUser) {
+            let result = makeApiResponce('User not found.', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+
+        const deleteUser = await UserModel.deleteOne({ _id: req.params.id });
+        if (!deleteUser) {
+
+            let result = makeApiResponce('Network Error please try again.', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+
+        let userResponce = {};
+        let result = makeApiResponce('User Delete Successfully', 1, OK, userResponce);
+        return res.json(result);
+
+    }catch(err){
+        console.log(err);
+        let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+        return res.status(INTERNAL_SERVER_ERROR).json(result)
+    }
+},
+
 };

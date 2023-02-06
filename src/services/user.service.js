@@ -74,4 +74,30 @@ export default {
       }
       return { value };
   },
+  //////// Add user ///////
+  validateAddUserSchema(body){
+    const schema = Joi.object().keys({
+        firstName: Joi.string().optional(),
+        lastName: Joi.string().optional(),
+        email: Joi.string().email().required(),
+        userType: Joi.string().optional()
+    });
+    const { error, value } = Joi.validate(body, schema);
+    if (error && error.details) {
+        return { error };
+    }
+    return { value };
+},
+validateUpdateUserSchema(body){
+    const schema = Joi.object().keys({
+        firstName: Joi.string().optional(),
+        lastName: Joi.string().optional(),
+        userType: Joi.string().optional()
+    });
+    const { error, value } = Joi.validate(body, schema);
+    if (error && error.details) {
+        return { error };
+    }
+    return { value };
+},
 };

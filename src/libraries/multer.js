@@ -14,6 +14,14 @@ var storage = diskStorage({
       upload_dir = `${devConfig.imagesPath.userImage}`
     }
 
+    if (file.fieldname == "image") {
+      upload_dir = `${devConfig.imagesPath.couponImage}`
+    }
+
+    if (file.fieldname == "csvFile") {
+      upload_dir = `${devConfig.docsPath.csvFiles}`
+    }
+
     sync(upload_dir); //create directories if not exist
     cb(null, upload_dir);
   },
