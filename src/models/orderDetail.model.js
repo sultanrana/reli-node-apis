@@ -85,11 +85,6 @@ openingDirection: {
         type: String,
         default: null,
     },
-dateSelection:[{
-        type:String,
-        default:null
-    }
-    ],
 totalAmount: {
         type: Number,
         default: null,

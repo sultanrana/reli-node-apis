@@ -7,7 +7,7 @@ const StaffSchema = new Schema({
     //     ref: 'User',
     //     required: true
     // },
-    comapny: {
+    company: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
       required: true

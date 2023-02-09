@@ -9,6 +9,9 @@ import ServiceModel from "../../models/service.model";
 import PropertyModel from "../../models/property.model";
 import OrderModel from "../../models/order.model";
 import OrderDetailModel from "../../models/orderDetail.model";
+import CompanyModel from "../../models/company.model";
+import OrderAcceptedModel from "../../models/orderAccepted.model";
+
 // Setup Stripe
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 export default {
@@ -19,11 +22,11 @@ export default {
             // const randomOtp = await randomValueHex("6");
         
             // VALIDATE THE REQUEST
-            const {error, value} = userService.validateSignupSchema(req.body);
-            if(error && error.details){
-                let result = makeApiResponce(error.message, 0, BAD_REQUEST)
-                return res.status(BAD_REQUEST).json(result);
-            }
+            // const {error, value} = userService.validateSignupSchema(req.body);
+            // if(error && error.details){
+            //     let result = makeApiResponce(error.message, 0, BAD_REQUEST)
+            //     return res.status(BAD_REQUEST).json(result);
+            // }
 
             const existingUser = await UserModel.findOne({ email: req.body.email });
             if (existingUser) {
@@ -40,6 +43,8 @@ export default {
             user.appartment = req.body.appartment;
             user.willingRange = req.body.willingRange;
             user.services = req.body.services;
+            user.company = req.body.company;
+            user.accountType = req.body.accountType;
             // user.otp = randomOtp;
             user.location = { type: 'Point', coordinates: [req.body.lat, req.body.lng] };
             const hash = await getEncryptedPassword(req.body.password);
@@ -579,22 +584,174 @@ export default {
         }
     },
 
-    async placeOrder(req, res) {
+ //    async placeOrder(req, res) {
+ //        let data = req.body.arrayData;
+ //     //let files = req.files;
+
+ //    let stripeCardToken = req.body.stripeCardToken;
+
+ //    //  const token = await stripe.tokens.create({
+ //    //      card: {
+ //    //          number: '4242424242424242',
+ //    //          exp_month: 2,
+ //    //          exp_year: 2023,
+ //    //          cvc: '314',
+ //    //      }
+ //    //  });
+ //    //  console.log(token);
+ //    //  return ;
+
+
+
+ //     try {
+
+ //         const getCardDetailByStripeCardtoken = await stripe.tokens.retrieve(
+ //             stripeCardToken
+ //         );
+ //         const stripeCharge = await stripe.charges.create({
+ //             amount: req.body.totalAmount,
+ //             currency: 'usd',
+ //             source: getCardDetailByStripeCardtoken.id,
+ //             description: 'My First Test Charge'
+ //         });
+
+ //     var newOrderModel = new OrderModel();
+ //     newOrderModel.user = req.currentUser;
+ //     newOrderModel.name = req.body.name;
+ //     newOrderModel.email = req.body.email;
+ //     newOrderModel.cardHolderName = req.body.cardHolderName;
+ //     // newOrderModel.country = '';
+ //     // newOrderModel.city ='';
+ //     // newOrderModel.postcode ='';
+ //     // newOrderModel.addressLine1 ='';
+ //     // newOrderModel.addressLine2 ='';
+ //     newOrderModel.cardBrand =stripeCharge.source.cardBrand;
+ //     newOrderModel.cardlast4 =stripeCharge.source.last4;
+ //     newOrderModel.cardExpMonth =stripeCharge.source.exp_month;
+ //     newOrderModel.cardExpYear =stripeCharge.source.exp_year;
+ //     newOrderModel.cardCvc =stripeCharge.source.cvc;
+ //     //newOrderModel.stripeCustomerId ='';
+ //     newOrderModel.stripePaymentId=stripeCharge.id,
+ //     newOrderModel.subTotalAmount = req.body.subTotalAmount;
+ //     newOrderModel.discountAmount = req.body.discountAmount;
+ //     newOrderModel.totalAmount = req.body.totalAmount;
+ //     newOrderModel.save(function (err) {});
+
+
+
+
+
+ //     for(var i = 0; i < data.length; i++) {
+
+ //         let arr = await getFileNameArrByItem(req.files,i);
+ //         //console.log(arr)
+
+ //          var newOrderDetailModel = new OrderDetailModel();
+ //         newOrderDetailModel.order = newOrderModel._id;
+ //         newOrderDetailModel.serviceId = data[i].serviceId;
+ //         newOrderDetailModel.serviceName = data[i].serviceName;
+ //         newOrderDetailModel.serviceType = data[i].serviceType;
+ //         newOrderDetailModel.propertyId = data[i].propertyId;
+ //         newOrderDetailModel.roomType = data[i].roomType;
+ //         newOrderDetailModel.distanceFromGround = data[i].distanceFromGround;
+ //         newOrderDetailModel.floorType = data[i].floorType;
+ //         newOrderDetailModel.measureType = data[i].measureType;
+ //         newOrderDetailModel.width = data[i].width;
+ //         newOrderDetailModel.height = data[i].height;
+ //         newOrderDetailModel.currectMeasurement = data[i].currectMeasurement;
+ //         newOrderDetailModel.images = arr;
+ //         newOrderDetailModel.temperedGlassType = data[i].temperedGlassType;
+ //         newOrderDetailModel.glassType = data[i].glassType;
+ //         newOrderDetailModel.designType = data[i].designType;
+ //         newOrderDetailModel.colorSelection = data[i].colorSelection;
+ //         newOrderDetailModel.styleSelection = data[i].styleSelection;
+ //         newOrderDetailModel.openingType = data[i].openingType;
+ //         newOrderDetailModel.openingDirection = data[i].openingDirection;
+ //         newOrderDetailModel.dateSelection = data[i].dateSelection;
+ //         newOrderDetailModel.totalAmount = data[i].totalAmount;
+ //         newOrderDetailModel.save(function (err) {});
+ //     }
+
+ //         let orderResponce = {
+ //             id: newOrderModel._id
+ //         }
+ //         let result = makeApiResponce('Order Created Successfully', 1, OK, orderResponce);
+ //         return res.json(result);
+
+ //     }catch(err){
+ //          let errorMessage
+ //         switch (err.type) {
+ //             case 'StripeCardError':
+ //                 // A declined card error
+ //                 err.message; // => e.g. "Your card's expiration year is invalid."
+ //                 errorMessage = "Your card's expiration year is invalid, "+err.message;
+ //                 break;
+ //             case 'StripeInvalidRequestError':
+ //                 // Invalid parameters were supplied to Stripe's API
+ //                 errorMessage = "Invalid parameters were supplied to Stripe's API, "+err.message;
+ //                 break;
+ //             case 'StripeAPIError':
+ //                 // An error occurred internally with Stripe's API
+ //                 errorMessage = "An error occurred internally with Stripe's API, "+err.message;
+ //                 break;
+ //             case 'StripeConnectionError':
+ //                 // Some kind of error occurred during the HTTPS communication
+ //                 errorMessage = "Some kind of error occurred during the HTTPS communication, "+err.message;
+ //                 break;
+ //             case 'StripeAuthenticationError':
+ //                 // You probably used an incorrect API key
+ //                 errorMessage = "You probably used an incorrect API key, "+err.message;
+ //                 break;
+ //             case 'StripeRateLimitError':
+ //                 // Too many requests hit the API too quickly
+ //                 errorMessage = "Too many requests hit the API too quickly, "+err.message;
+ //                 break;
+ //             case 'StripePermissionError':
+ //                 // Access to a resource is not allowed
+ //                 errorMessage = "Access to a resource is not allowed, "+err.message;
+ //                 break;
+ //             case 'StripeIdempotencyError':
+ //                 // An idempotency key was used improperly
+ //                 errorMessage = "An idempotency key was used improperly, "+err.message;
+ //                 break;
+ //             case 'StripeInvalidGrantError':
+ //                 // InvalidGrantError is raised when a specified code doesn't exist, is
+ //                 // expired, has been used, or doesn't belong to you; a refresh token doesn't
+ //                 // exist, or doesn't belong to you; or if an API key's mode (live or test)
+ //                 // doesn't match the mode of a code or refresh token.
+ //                 errorMessage = " // InvalidGrantError is raised when a specified code doesn't exist, is\n" +
+ //                     "                    // expired, has been used, or doesn't belong to you; a refresh token doesn't\n" +
+ //                     "                    // exist, or doesn't belong to you; or if an API key's mode (live or test)\n" +
+ //                     "                    // doesn't match the mode of a code or refresh token, "+err.message;
+ //                 break;
+ //             default:
+ //                 let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+ //                 return res.status(INTERNAL_SERVER_ERROR).json(result)
+ //         }
+
+ //          let result1 = makeApiResponce(errorMessage, 1, BAD_REQUEST)
+ //         return res.status(BAD_REQUEST).json(result1);
+
+
+ //     }
+ // },
+
+ async placeOrder(req, res) {
         let data = req.body.arrayData;
      //let files = req.files;
 
     let stripeCardToken = req.body.stripeCardToken;
 
-    //  const token = await stripe.tokens.create({
-    //      card: {
-    //          number: '4242424242424242',
-    //          exp_month: 2,
-    //          exp_year: 2023,
-    //          cvc: '314',
-    //      }
-    //  });
-    //  console.log(token);
-    //  return ;
+     // const token = await stripe.tokens.create({
+     //     card: {
+     //         number: '4242424242424242',
+     //         exp_month: 2,
+     //         exp_year: 2023,
+     //         cvc: '314',
+     //     }
+     // });
+     // console.log(token);
+     // return ;
 
 
 
@@ -615,21 +772,28 @@ export default {
      newOrderModel.name = req.body.name;
      newOrderModel.email = req.body.email;
      newOrderModel.cardHolderName = req.body.cardHolderName;
+
      // newOrderModel.country = '';
      // newOrderModel.city ='';
      // newOrderModel.postcode ='';
      // newOrderModel.addressLine1 ='';
      // newOrderModel.addressLine2 ='';
+
      newOrderModel.cardBrand =stripeCharge.source.cardBrand;
      newOrderModel.cardlast4 =stripeCharge.source.last4;
      newOrderModel.cardExpMonth =stripeCharge.source.exp_month;
      newOrderModel.cardExpYear =stripeCharge.source.exp_year;
      newOrderModel.cardCvc =stripeCharge.source.cvc;
+
      //newOrderModel.stripeCustomerId ='';
-     newOrderModel.stripePaymentId=stripeCharge.id,
+
+    newOrderModel.stripePaymentId=stripeCharge.id,
+
      newOrderModel.subTotalAmount = req.body.subTotalAmount;
      newOrderModel.discountAmount = req.body.discountAmount;
      newOrderModel.totalAmount = req.body.totalAmount;
+     let dateArr = req.body.dateSelection.split(",");
+     newOrderModel.dateSelection = dateArr;
      newOrderModel.save(function (err) {});
 
 
@@ -662,7 +826,6 @@ export default {
          newOrderDetailModel.styleSelection = data[i].styleSelection;
          newOrderDetailModel.openingType = data[i].openingType;
          newOrderDetailModel.openingDirection = data[i].openingDirection;
-         newOrderDetailModel.dateSelection = data[i].dateSelection;
          newOrderDetailModel.totalAmount = data[i].totalAmount;
          newOrderDetailModel.save(function (err) {});
      }
@@ -670,7 +833,7 @@ export default {
          let orderResponce = {
              id: newOrderModel._id
          }
-         let result = makeApiResponce('Order Created Successfully', 1, OK, orderResponce);
+         let result = makeApiResponce('property Created Successfully', 1, OK, orderResponce);
          return res.json(result);
 
      }catch(err){
@@ -787,6 +950,247 @@ export default {
                 'orderDetailInfo': orderDetailInfo,
                 }]
             let result = makeApiResponce('Order Detail', 1, OK, orderDetail);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async listOfCompanies(req, res){
+        try{
+            
+            let getCompany =  await CompanyModel.find({});
+            if(!getCompany){
+                let result = makeApiResponce('Empty list company', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            let result = makeApiResponce('Company Listing', 1, OK, getCompany);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async contractorDashboard(req, res){
+        try{
+            // orders that has requestStatus=Pending
+            let getClaimOrders =  await OrderModel.find({orderStatus:'Pending',requestStatus:'Pending'});
+            // orders that has requestStatus=Accepted and by logged in contractor
+            let getActionNeededOrders = await OrderModel.find({requestStatus:'Accepted',orderStatus: { $ne: 'Completed' }});
+
+            if(!getClaimOrders && !getActionNeededOrders){
+                let result = makeApiResponce('Empty list of Projects', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let contractorDashboard=[{
+                'claimOrders': getClaimOrders,
+                'actionNeededOrders': getActionNeededOrders,
+            }]
+
+            let result = makeApiResponce('List of Projects', 1, OK, contractorDashboard);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    
+    async listOfActiveContractorProjects(req, res) {
+        const currentUserId = req.currentUser._id;
+        try{
+            const getActiveOrders = await OrderModel.aggregate(
+                    [
+                        {
+                        $match: {orderAccepted: { $ne: null }, requestStatus:'Accepted',orderStatus: { $ne: 'Completed' }}
+                        },
+                        {
+                        $lookup:
+                            {
+                                from: 'orderdetails',
+                                localField: '_id',
+                                foreignField: 'order',
+                                as: 'orderdetails'
+                            }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                "pipeline": [
+                                    {
+                                        $match: {user: currentUserId}
+                                    },
+                                    {"$project": {"user": 1, "statusBit": 1}}
+                                ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+            if(!getActiveOrders){
+                let result = makeApiResponce('Empty list of Active Projects', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('List of Active Projects', 1, OK, getActiveOrders);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async listOfAvailableContractorProjects(req, res){
+        try{
+            let getAvailableOrders =  await OrderModel.find({orderStatus:'Pending',requestStatus:'Pending'});
+
+            if(!getAvailableOrders){
+                let result = makeApiResponce('Empty list of Available Projects', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('List of Available Projects', 1, OK, getAvailableOrders);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async listOfCompletedContractorProjects(req, res){
+        const currentUserId = req.currentUser._id;
+        try{
+            const getCompletedOrders = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {orderAccepted: { $ne: null }, orderStatus:'Completed',requestStatus:'Accepted'}
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderdetails',
+                                localField: '_id',
+                                foreignField: 'order',
+                                as: 'orderdetails'
+                            }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                "pipeline": [
+                                    {
+                                        $match: {user: currentUserId}
+                                    },
+                                    {"$project": {"user": 1, "statusBit": 1}}
+                                ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+            if(!getCompletedOrders){
+                let result = makeApiResponce('Empty list of Completed Projects', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            
+            let result = makeApiResponce('List of Completed Projects', 1, OK, getCompletedOrders);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async changeProjectRequestStatus(req, res) {
+        try {
+            const findOrder = await OrderModel.findOne({_id:req.params.id, orderStatus:'Pending', requestStatus:'Pending', delBit: false});
+            if (!findOrder) {
+                let result = makeApiResponce('Project not found.', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            // VALIDATE THE REQUEST
+            // const {error, value} = orderService.validateUpdateRequestStatusSchema(req.body);
+            // if(error && error.details){
+            //     let result = makeApiResponce(error.message, 0, BAD_REQUEST)
+            //     return res.status(BAD_REQUEST).json(result);
+            // }
+
+            const orderAcceptedModel = new OrderAcceptedModel();
+            orderAcceptedModel.user = req.currentUser._id;
+            orderAcceptedModel.order = findOrder._id;
+            orderAcceptedModel.save(function (err) {});
+            findOrder.requestStatus = req.body.requestStatus;
+            findOrder.orderAccepted = orderAcceptedModel._id;
+            await findOrder.save();
+            let orderResponce = {
+                id: findOrder._id
+            }
+            let result = makeApiResponce('Project request status updated successfully', 1, OK, orderResponce);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async changeProjectOrderStatus(req, res) {
+        try {
+            const findOrder = await OrderModel.findOne({_id:req.params.id, requestStatus:'Accepted', delBit: false});
+            if (!findOrder) {
+                let result = makeApiResponce('Project not found.', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            // VALIDATE THE REQUEST
+            // const {error, value} = orderService.validateUpdateOrderStatusSchema(req.body);
+            // if(error && error.details){
+            //     let result = makeApiResponce(error.message, 0, BAD_REQUEST)
+            //     return res.status(BAD_REQUEST).json(result);
+            // }
+
+            findOrder.orderStatus = req.body.orderStatus;
+            await findOrder.save();
+
+            let orderResponce = {
+                id: findOrder._id
+            }
+
+            let result = makeApiResponce('Project status updated successfully', 1, OK, orderResponce);
             return res.json(result);
 
         }catch(err){

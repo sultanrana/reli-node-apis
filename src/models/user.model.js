@@ -88,6 +88,14 @@ const UserSchema = new Schema({
       type: Date,
       default: Date.now()
     },
+    company: {
+      type: Schema.Types.ObjectId,
+      ref: 'Company'
+    },
+    accountType: {
+      type: String,
+      default: 'standard_contractor',
+    },
   },
   { timestamps: true }
   );

@@ -7,6 +7,11 @@ const Order = new Schema({
             ref: 'User',
             required: true
         },
+    orderAccepted: {
+        type: Schema.Types.ObjectId,
+        ref: "OrderAccepted",
+        default: null
+    },
     name:{
         type:String,
         default:null
@@ -84,13 +89,19 @@ const Order = new Schema({
         default: true
     },
     orderStatus:{
-        type:String,
-        default:"new"
+        type: String,
+        required: true,
+        default: 'Pending'
     },
-    orderStatus:{
-        type:String,
-        default:"new"
+    requestStatus:{
+        type: String,
+        required: true,
+        default: 'Pending'
     },
+    dateSelection:[{
+        type:String,
+        default:null
+    }],
     delBit: {
             type: Boolean,
             default: false,

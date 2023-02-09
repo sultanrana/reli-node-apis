@@ -6,7 +6,7 @@ import { makeApiResponce } from '../../libraries/responce';
     async listing(req, res){
         try{
             
-            let getStaff =  await StaffModel.find({});
+            let getStaff =  await StaffModel.find({company:req.params.id});
             if(!getStaff){
                 let result = makeApiResponce('Empty list coupon', 1, BAD_REQUEST)
                 return res.status(BAD_REQUEST).json(result);
@@ -35,7 +35,7 @@ import { makeApiResponce } from '../../libraries/responce';
                 }
                 
                 const staffModel = new StaffModel();
-                staffModel.comapny = req.body.comapny;
+                staffModel.company = req.body.company;
                 staffModel.name = req.body.name;
                 staffModel.email = req.body.email;
                 staffModel.phone = req.body.phone;
@@ -71,7 +71,7 @@ import { makeApiResponce } from '../../libraries/responce';
                  image = req.files[0].filename;
              }
                          
-            findStaff.comapny = req.body.comapny;
+            findStaff.company = req.body.company;
             findStaff.name = req.body.name;
             findStaff.phone = req.body.phone;
             findStaff.approvedByReli = req.body.approvedByReli;
