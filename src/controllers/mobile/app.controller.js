@@ -1,4 +1,4 @@
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK } from "http-status-codes";
+import {BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK, NOT_FOUND} from "http-status-codes";
 import bcryptjs from 'bcryptjs';
 import userService from "../../services/user.service.js";
 import UserModel from "../../models/user.model";
@@ -11,6 +11,14 @@ import OrderModel from "../../models/order.model";
 import OrderDetailModel from "../../models/orderDetail.model";
 import CompanyModel from "../../models/company.model";
 import OrderAcceptedModel from "../../models/orderAccepted.model";
+import StaffModel from "../../models/staff.model";
+import mongoose from 'mongoose';
+import NotificationModel from "../../models/notification.model";
+import AssignedOrderModel from "../../models/assignedOrder.model";
+import UserStripeCardModel from "../../models/userStripeCard.model";
+import fcmNode from "fcm-node";
+const FCM = require('../../libraries/notifications.js');
+
 
 // Setup Stripe
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -53,6 +61,26 @@ export default {
             let userResponce = {
                 email: user.email,
             }
+           if (req.body.userType=='customer') {
+               const customer = await stripe.customers.create({
+                   name: req.body.firstName + ' ' + req.body.lastName,
+                   email: req.body.email,
+                   description: 'My First Test Customer (created for API docs at https://www.stripe.com/docs/api)',
+                   address: {
+                       city: 'customer city',
+                       country: 'customer country',
+                       line1: req.body.address,
+                       line2: 'customer address line 2',
+                       postal_code: 'customer postcode'
+                   }
+
+               });
+
+               user.stripeCustomerId = customer.id;
+               await user.save();
+           }
+
+
 
             // const passwordLink = `
             //     <h2>Hi ${req.body.firstName}</h2>
@@ -77,11 +105,11 @@ export default {
     async login(req, res){
             try{
                 // VALIDATE THE REQUEST
-                const {error, value} = userService.validateLoginSchema(req.body);
-                if(error && error.details){
-                    let result = makeApiResponce(error.message, 0, BAD_REQUEST)
-                    return res.status(BAD_REQUEST).json(result);
-                }
+                // const {error, value} = userService.validateLoginSchema(req.body);
+                // if(error && error.details){
+                //     let result = makeApiResponce(error.message, 0, BAD_REQUEST)
+                //     return res.status(BAD_REQUEST).json(result);
+                // }
                 // FETCH THE USER
                 const userQuery = { email: req.body.email };
                 let user =  await UserModel.findOne(userQuery);
@@ -105,6 +133,22 @@ export default {
                             userData : user,
                             token: token
                         }
+
+                    const findUser = await UserModel.findById(user._id);
+                    findUser.fcmToken = req.body.fcmToken;
+                    await findUser.save();
+
+                    // FCM.push_notification("Fundraiser goal", `Congratulations!.`, req.body.fcmToken, 12);
+
+                    // let Noti = new Notification({
+                    //     receiverId: Found.userId._id,
+                    //     notificationText: `Congratulations! ${Found.title} has reached ${avg}% of its goal.`,
+                    //     module_id: 'Charity',
+                    //     module_value: charityPayment._id
+                    //   });
+                    //   await Noti.save();
+
+
                     let result = makeApiResponce('LoggedIn Successfully', 1, OK, userResponce);
                     return res.json(result);       
                 }
@@ -670,7 +714,7 @@ export default {
  //         newOrderDetailModel.dateSelection = data[i].dateSelection;
  //         newOrderDetailModel.totalAmount = data[i].totalAmount;
  //         newOrderDetailModel.save(function (err) {});
- //     }
+ //
 
  //         let orderResponce = {
  //             id: newOrderModel._id
@@ -740,7 +784,8 @@ export default {
         let data = req.body.arrayData;
      //let files = req.files;
 
-    let stripeCardToken = req.body.stripeCardToken;
+     let stripeCardId = req.body.stripeCardId;
+    //let stripeCardToken = req.body.stripeCardToken;
 
      // const token = await stripe.tokens.create({
      //     card: {
@@ -751,21 +796,24 @@ export default {
      //     }
      // });
      // console.log(token);
-     // return ;
+    // return ;
 
 
 
      try {
 
-         const getCardDetailByStripeCardtoken = await stripe.tokens.retrieve(
-             stripeCardToken
-         );
+         // const getCardDetailByStripeCardtoken = await stripe.tokens.retrieve(
+         //     stripeCardToken
+         // );
          const stripeCharge = await stripe.charges.create({
-             amount: req.body.totalAmount,
+             customer:req.currentUser.stripeCustomerId,
+             amount: req.body.totalAmount * 100,
              currency: 'usd',
-             source: getCardDetailByStripeCardtoken.id,
+             source: stripeCardId,
              description: 'My First Test Charge'
          });
+
+
 
      var newOrderModel = new OrderModel();
      newOrderModel.user = req.currentUser;
@@ -807,10 +855,10 @@ export default {
 
           var newOrderDetailModel = new OrderDetailModel();
          newOrderDetailModel.order = newOrderModel._id;
-         newOrderDetailModel.serviceId = data[i].serviceId;
+         newOrderDetailModel.service = data[i].serviceId;
          newOrderDetailModel.serviceName = data[i].serviceName;
          newOrderDetailModel.serviceType = data[i].serviceType;
-         newOrderDetailModel.propertyId = data[i].propertyId;
+         newOrderDetailModel.property = data[i].propertyId;
          newOrderDetailModel.roomType = data[i].roomType;
          newOrderDetailModel.distanceFromGround = data[i].distanceFromGround;
          newOrderDetailModel.floorType = data[i].floorType;
@@ -897,7 +945,90 @@ export default {
 
  async dashboard(req, res){
         try{
-            let getOrder =  await OrderModel.find({user : req.currentUser});
+
+         // console.log(req.currentUser);
+
+            //let getOrder = await OrderModel.find({user : req.currentUser});
+            let getOrder =  await OrderModel.aggregate(
+                [
+                    {
+                        $match: {user : req.currentUser._id}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderaccepteds',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             "pipeline": [
+                    //                 {
+                    //                     $match: {user: currentUserId}
+                    //                 },
+                    //                 {"$project": {"user": 1, "statusBit": 1}}
+                    //             ],
+                    //             as: 'orderaccepteds',
+                    //         },
+                    // },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+            // let getCompletedOrders = await OrderModel.find({orderStatus:'Completed',requestStatus:'Accepted',dateSelection: { $elemMatch: {$eq: todayDate}}});
+
+            //await OrderModel.find({user : req.currentUser});
+            //  console.log(getOrder);
+            // console.log(req.currentUser);
+            // return ;
+
+
             if(!getOrder){
                 let result = makeApiResponce('Empty list Order', 1, BAD_REQUEST)
                 return res.status(BAD_REQUEST).json(result);
@@ -914,8 +1045,155 @@ export default {
 
     async listOfProjects(req, res){
         try{
-            let getCompletedStatusOrders =  await OrderModel.find({user : req.currentUser,orderStatus:'Completed'});
-            let getNotCompletedStatusOrders =  await OrderModel.find({user : req.currentUser,orderStatus: { "$ne": 'Completed' }});
+            let getCompletedStatusOrders  = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {user : req.currentUser._id,orderStatus:'Completed'}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+
+                //await OrderModel.find({user : req.currentUser,orderStatus:'Completed'});
+            let getNotCompletedStatusOrders  = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {user : req.currentUser._id,orderStatus: { "$ne": 'Completed' }}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+
+
+              //  await OrderModel.find({user : req.currentUser,orderStatus: { "$ne": 'Completed' }});
 
             if(!getCompletedStatusOrders && !getNotCompletedStatusOrders){
                 let result = makeApiResponce('Empty list of Projects', 1, BAD_REQUEST)
@@ -940,16 +1218,279 @@ export default {
     async orderDetail(req, res){
         try{
             const orderModel = await OrderModel.findById(req.params.id);
-            const orderDetailInfo =  await OrderDetailModel.find({order : req.params.id}).populate('propertyId');
-            if(!orderModel){
+           // const orderDetailInfo =  await OrderDetailModel.find({order : req.params.id}).populate('property').populate('service');
+
+
+
+
+            let orderDetail  = await OrderModel.aggregate([
+                    {
+                        $match: {_id: mongoose.Types.ObjectId(req.params.id)}
+                    },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    { $unwind: { path: '$orderaccepteds', preserveNullAndEmptyArrays: true } },
+                    {
+                        $lookup:
+                            {
+                                from: 'assignedorders',
+                                localField: '_id',
+                                foreignField: 'order',
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "users",
+                                            localField: "userBy",
+                                            foreignField: "_id",
+                                            as: "userBy"
+                                        },
+                                    },
+                                    // { $unwind: "$property" }, mondatroy
+                                    { $unwind: { path: '$userBy', preserveNullAndEmptyArrays: true } },
+                                    {
+                                        $lookup: {
+                                            from: "users",
+                                            localField: "userTo",
+                                            foreignField: "_id",
+                                            as: "userTo"
+                                        },
+                                    },
+                                    { $unwind: { path: '$userTo', preserveNullAndEmptyArrays: true } },
+
+                                    // {
+                                    //     $unwind: "$property" if mandatory
+                                    // }
+                                ],
+                                as: 'assignedorder',
+                            },
+                    },
+                    { $unwind: { path: '$assignedorder', preserveNullAndEmptyArrays: true } },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+
+            // console.log(orderDetail);
+            // console.log(req.params.id);
+            // return ;
+
+
+
+            if(!orderDetail){
                 let result = makeApiResponce('Empty Order Detail', 1, BAD_REQUEST)
                 return res.status(BAD_REQUEST).json(result);
             }
-            let orderDetail=[{
-                'orderInfo': orderModel,
-                'orderDetailInfo': orderDetailInfo,
-                }]
+            // let orderDetail=[{
+            //     'orderInfo': orderModel,
+            //     'orderDetails': orderDetailInfo,
+            //     }]
             let result = makeApiResponce('Order Detail', 1, OK, orderDetail);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async addCustomerStripeCard(req, res) {
+        let stripeCardToken = req.body.stripeCardToken;
+        let stripeCardHolderName = req.body.stripeCardHolderName;
+
+        // const token = await stripe.tokens.create({
+        //     card: {
+        //         number: '4242424242424242',
+        //         exp_month: 4,
+        //         exp_year: 2023,
+        //         cvc: '314',
+        //     }
+        // });
+        // console.log(token);
+        // return ;
+
+
+        try {
+
+            const stripeCustomerCard = await stripe.customers.createSource(
+                req.currentUser.stripeCustomerId,
+                {
+                        source: stripeCardToken,
+                       }
+
+
+
+            );
+
+            let newUserStripeCardModel = new UserStripeCardModel();
+            newUserStripeCardModel.user = req.currentUser;
+            newUserStripeCardModel.stripeCardHolderName = stripeCardHolderName;
+            newUserStripeCardModel.stripeCardId = stripeCustomerCard.id;
+
+            newUserStripeCardModel.stripeCardBrand =stripeCustomerCard.brand;
+            newUserStripeCardModel.stripeCardlast4 =stripeCustomerCard.last4;
+            newUserStripeCardModel.stripeCardExpMonth =stripeCustomerCard.exp_month;
+            newUserStripeCardModel.stripeCardExpYear =stripeCustomerCard.exp_year;
+          //  newUserStripeCardModel.stripeCardCvc =stripeCustomerCard.cvc;
+            newUserStripeCardModel.save(function (err) {});
+
+            let userStripeCardResponce = {
+                id: newUserStripeCardModel._id
+            }
+            let result = makeApiResponce('Customer stripe card created successfully', 1, OK, userStripeCardResponce);
+            return res.json(result);
+
+        }catch(err){
+            let errorMessage
+            switch (err.type) {
+                case 'StripeCardError':
+                    // A declined card error
+                    err.message; // => e.g. "Your card's expiration year is invalid."
+                    errorMessage = "Your card's expiration year is invalid, "+err.message;
+                    break;
+                case 'StripeInvalidRequestError':
+                    // Invalid parameters were supplied to Stripe's API
+                    errorMessage = "Invalid parameters were supplied to Stripe's API, "+err.message;
+                    break;
+                case 'StripeAPIError':
+                    // An error occurred internally with Stripe's API
+                    errorMessage = "An error occurred internally with Stripe's API, "+err.message;
+                    break;
+                case 'StripeConnectionError':
+                    // Some kind of error occurred during the HTTPS communication
+                    errorMessage = "Some kind of error occurred during the HTTPS communication, "+err.message;
+                    break;
+                case 'StripeAuthenticationError':
+                    // You probably used an incorrect API key
+                    errorMessage = "You probably used an incorrect API key, "+err.message;
+                    break;
+                case 'StripeRateLimitError':
+                    // Too many requests hit the API too quickly
+                    errorMessage = "Too many requests hit the API too quickly, "+err.message;
+                    break;
+                case 'StripePermissionError':
+                    // Access to a resource is not allowed
+                    errorMessage = "Access to a resource is not allowed, "+err.message;
+                    break;
+                case 'StripeIdempotencyError':
+                    // An idempotency key was used improperly
+                    errorMessage = "An idempotency key was used improperly, "+err.message;
+                    break;
+                case 'StripeInvalidGrantError':
+                    // InvalidGrantError is raised when a specified code doesn't exist, is
+                    // expired, has been used, or doesn't belong to you; a refresh token doesn't
+                    // exist, or doesn't belong to you; or if an API key's mode (live or test)
+                    // doesn't match the mode of a code or refresh token.
+                    errorMessage = " // InvalidGrantError is raised when a specified code doesn't exist, is\n" +
+                        "                    // expired, has been used, or doesn't belong to you; a refresh token doesn't\n" +
+                        "                    // exist, or doesn't belong to you; or if an API key's mode (live or test)\n" +
+                        "                    // doesn't match the mode of a code or refresh token, "+err.message;
+                    break;
+                default:
+                    let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+                    return res.status(INTERNAL_SERVER_ERROR).json(result)
+            }
+
+            let result1 = makeApiResponce(errorMessage, 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result1);
+
+
+        }
+    },
+    async listOfCustomerStripeCards(req, res){
+        try{
+            let getUserStripeCards  = await UserStripeCardModel.aggregate(
+                [
+                    {
+                        $match: {user : req.currentUser._id}
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+            if(!getUserStripeCards){
+                let result = makeApiResponce('Empty list of user stripe cards', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Listing user stripe cards', 1, OK, getUserStripeCards);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async customerStripeCardDetail(req, res){
+        try{
+            const userStripeCardModel = await UserStripeCardModel.findById(req.params.id);
+            // const orderDetailInfo =  await OrderDetailModel.find({order : req.params.id}).populate('property').populate('service');
+
+
+
+
+
+
+
+            if(!userStripeCardModel){
+                let result = makeApiResponce('Empty customer stripe card detail', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Customer stripe card detail', 1, OK, userStripeCardModel);
             return res.json(result);
 
         }catch(err){
@@ -979,9 +1520,153 @@ export default {
     async contractorDashboard(req, res){
         try{
             // orders that has requestStatus=Pending
-            let getClaimOrders =  await OrderModel.find({orderStatus:'Pending',requestStatus:'Pending'});
+            let getClaimOrders = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {orderStatus:'Pending',requestStatus:'Pending'}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+                //await OrderModel.find({orderStatus:'Pending',requestStatus:'Pending'});
             // orders that has requestStatus=Accepted and by logged in contractor
-            let getActionNeededOrders = await OrderModel.find({requestStatus:'Accepted',orderStatus: { $ne: 'Completed' }});
+            let getActionNeededOrders = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {requestStatus:'Accepted',orderStatus: { $ne: 'Completed' }}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+                //await OrderModel.find({requestStatus:'Accepted',orderStatus: { $ne: 'Completed' }});
 
             if(!getClaimOrders && !getActionNeededOrders){
                 let result = makeApiResponce('Empty list of Projects', 1, BAD_REQUEST)
@@ -1010,15 +1695,48 @@ export default {
                         {
                         $match: {orderAccepted: { $ne: null }, requestStatus:'Accepted',orderStatus: { $ne: 'Completed' }}
                         },
+                    //     {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
                         {
-                        $lookup:
-                            {
-                                from: 'orderdetails',
-                                localField: '_id',
-                                foreignField: 'order',
-                                as: 'orderdetails'
+                            $lookup: {
+                                from: "orderdetails",
+                                localField: "_id",
+                                foreignField: "order",
+                                as: "orderdetails",
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "properties",
+                                            localField: "property",
+                                            foreignField: "_id",
+                                            as: "property"
+                                        },
+                                    },
+                                    // { $unwind: "$property" }, mondatroy
+                                    { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                    {
+                                        $lookup: {
+                                            from: "services",
+                                            localField: "service",
+                                            foreignField: "_id",
+                                            as: "service"
+                                        },
+                                    },
+                                    { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                    // {
+                                    //     $unwind: "$property" if mandatory
+                                    // }
+                                ],
                             }
-                    },
+                        },
                     {
                         $lookup:
                             {
@@ -1060,7 +1778,81 @@ export default {
 
     async listOfAvailableContractorProjects(req, res){
         try{
-            let getAvailableOrders =  await OrderModel.find({orderStatus:'Pending',requestStatus:'Pending'});
+            let getAvailableOrders = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {orderStatus:'Pending',requestStatus:'Pending'}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+
+
+                ///await OrderModel.find({orderStatus:'Pending',requestStatus:'Pending'});
 
             if(!getAvailableOrders){
                 let result = makeApiResponce('Empty list of Available Projects', 1, BAD_REQUEST)
@@ -1084,14 +1876,47 @@ export default {
                     {
                         $match: {orderAccepted: { $ne: null }, orderStatus:'Completed',requestStatus:'Accepted'}
                     },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
                     {
-                        $lookup:
-                            {
-                                from: 'orderdetails',
-                                localField: '_id',
-                                foreignField: 'order',
-                                as: 'orderdetails'
-                            }
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
                     },
                     {
                         $lookup:
@@ -1184,7 +2009,105 @@ export default {
             // }
 
             findOrder.orderStatus = req.body.orderStatus;
-            await findOrder.save();
+            findOrder.orderStatusDate = Date.now();
+            // await findOrder.save();
+
+            let getDataNoti;
+            if (req.body.orderStatus == 'Completed') {
+                getDataNoti = await OrderModel.findOne({ _id: req.params.id }).populate("user");
+                let fcmToken = getDataNoti.user.fcmToken; 
+                FCM.push_notification("Project Completed", `Your project ${req.params.id} has been completed`, fcmToken, 12);
+                // // console.log(fcmToken);
+                const notificationModel = new NotificationModel();
+                notificationModel.user = mongoose.Types.ObjectId(getDataNoti.user._id);
+                notificationModel.title = "Project Completed";
+                notificationModel.body = `Your project ${req.params.id} has been completed`;
+                notificationModel.type = "Project Completed";
+                notificationModel.deviceToken = fcmToken;
+                notificationModel.save();
+
+                let orderAccepted = getDataNoti.orderAccepted; 
+                // console.log(getDataNotiCon);
+                let getDataNotiCon = await OrderAcceptedModel.findOne({ _id: orderAccepted }).populate("user");
+                let fcmTokenContractor = getDataNotiCon.user.fcmToken; 
+                FCM.push_notification("A project has been completed", `The project ${req.params.id} has been completed`, fcmTokenContractor, 12);
+                // console.log(getDataNotiCon.user._id);
+                const notificationModelContractor = new NotificationModel();
+                notificationModelContractor.user = mongoose.Types.ObjectId(getDataNotiCon.user._id);
+                notificationModelContractor.title = "A project has been completed";
+                notificationModelContractor.body = `The project ${req.params.id} has been completed`;
+                notificationModelContractor.type = "Project Completed";
+                notificationModelContractor.deviceToken = fcmTokenContractor;
+                notificationModelContractor.save();
+            }
+
+
+            
+            if (req.body.orderStatus == 'Scheduled') {
+                getDataNoti = await OrderModel.findOne({ _id: req.params.id }).populate("user");
+                let fcmTokenCusSch = getDataNoti.user.fcmToken;
+                let firstNameCusSch = getDataNoti.user.firstName;
+                FCM.push_notification("Project Scheduled", `Hi ${firstNameCusSch}, your project ${req.params.id} has been scheduled`, fcmTokenCusSch, 12);
+                // // console.log(fcmToken);
+                const notificationModel = new NotificationModel();
+                notificationModel.user = mongoose.Types.ObjectId(getDataNoti.user._id);
+                notificationModel.title = "Project Scheduled";
+                notificationModel.body = `Hi ${firstNameCusSch}, your project ${req.params.id} has been scheduled`;
+                notificationModel.type = "Project Scheduled";
+                notificationModel.deviceToken = fcmTokenCusSch;
+                notificationModel.save();
+
+            }
+
+
+            if (req.body.orderStatus == 'Enroute') {
+                getDataNoti = await OrderModel.findOne({ _id: req.params.id }).populate("user");
+                let fcmTokenCusEnr = getDataNoti.user.fcmToken;
+                let firstNameCusEnr = getDataNoti.user.firstName;
+                FCM.push_notification("Contractor on the Way", `Hi ${firstNameCusEnr}, your contractor is on the way`, fcmTokenCusEnr, 12);
+                // // console.log(fcmToken);
+                const notificationModel = new NotificationModel();
+                notificationModel.user = mongoose.Types.ObjectId(getDataNoti.user._id);
+                notificationModel.title = "Contractor on the Way";
+                notificationModel.body = `Hi ${firstNameCusEnr}, your contractor is on the way`;
+                notificationModel.type = "Contractor on the Way";
+                notificationModel.deviceToken = fcmTokenCusEnr;
+                notificationModel.save();
+
+            }
+
+
+            if (req.body.orderStatus == 'Arrived') {
+                getDataNoti = await OrderModel.findOne({ _id: req.params.id }).populate("user");
+                let fcmTokenCusArr = getDataNoti.user.fcmToken;
+                let firstNameCusArr = getDataNoti.user.firstName;
+                FCM.push_notification("Contractor Arrived”", `Hi ${firstNameCusArr}, your contractor has arrived`, fcmTokenCusArr, 12);
+                // // console.log(fcmToken);
+                const notificationModel = new NotificationModel();
+                notificationModel.user = mongoose.Types.ObjectId(getDataNoti.user._id);
+                notificationModel.title = "Contractor Arrived”";
+                notificationModel.body = `Hi ${firstNameCusArr}, your contractor has arrived`;
+                notificationModel.type = "Contractor Arrived”";
+                notificationModel.deviceToken = fcmTokenCusArr;
+                notificationModel.save();
+
+            }
+
+
+            if (req.body.orderStatus == 'Assigned') {
+                getDataNoti = await AssignedOrderModel.findOne({ order: req.params.id }).populate("userTo");
+                // console.log(getDataNoti);
+                let fcmTokenContractorAss = getDataNoti.userTo.fcmToken; 
+                FCM.push_notification("Project Assignment", `You have been assigned as the contractor for project ${req.params.id}`, fcmTokenContractorAss, 12);
+                // console.log(getDataNotiCon.user._id);
+                const notificationModelContractor = new NotificationModel();
+                notificationModelContractor.user = mongoose.Types.ObjectId(getDataNoti.userTo._id);
+                notificationModelContractor.title = "Project Assignment";
+                notificationModelContractor.body = `You have been assigned as the contractor for project ${req.params.id}`;
+                notificationModelContractor.type = "Project Assignment";
+                notificationModelContractor.deviceToken = fcmTokenContractorAss;
+                notificationModelContractor.save();
+            }
 
             let orderResponce = {
                 id: findOrder._id
@@ -1199,7 +2122,442 @@ export default {
             return res.status(INTERNAL_SERVER_ERROR).json(result)
         }
     },
+    async listOfStaff(req, res) {
+        try {
+             // const findStaff = await StaffModel.find({company: req.params.id});
+             const userQuery = { company: req.params.id, accountType : 'standard_contractor' };
+             const findStaff = await UserModel.find(userQuery);
+             if (!findStaff) {
+                 let result = makeApiResponce('Not found.', 1, BAD_REQUEST)
+                 return res.status(BAD_REQUEST).json(result);
+             }
+             let result = makeApiResponce('List of Staff', 1, OK, findStaff);
+             return res.json(result);
 
+         }catch(err){
+             console.log(err);
+             let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+             return res.status(INTERNAL_SERVER_ERROR).json(result)
+         }
+     },
+    //// NOTIFICAITON CRUD
+    async listOfNotifications(req, res){
+        try{
+            let getNotifications =  await NotificationModel.find().populate('user');
+            if(!getNotifications){
+                let result = makeApiResponce('Empty list Notifications', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Notification Listing', 1, OK, getNotifications);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async addNotification(req, res) {
+        try {
+            const notificationModel = new NotificationModel();
+            notificationModel.user = mongoose.Types.ObjectId(req.body.user);
+            notificationModel.title = req.body.title;
+            notificationModel.body = req.body.body;
+            notificationModel.type = req.body.type;
+            notificationModel.deviceToken = req.body.deviceToken;
+            notificationModel.save();
+            let notificationResponce = {
+                id: notificationModel._id
+            }
+            let result = makeApiResponce('Notification Created Successfully', 1, OK, notificationResponce);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async notificationDetail(req, res){
+        try{
+            const notificationModel = await NotificationModel.findById(req.params.id).populate('user');
+            if(!notificationModel){
+                let result = makeApiResponce('Empty Notification Detail', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Notification Detail', 1, OK, notificationModel);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+    async assignProjectToUser(req, res) {
+        try {
+            if (mongoose.isValidObjectId(req.body.userTo) && mongoose.isValidObjectId(req.body.order)) {
+
+                const isProjectAlreadyAssigned = await AssignedOrderModel.findOne({order:req.body.order, delBit: false})
+                if (!isProjectAlreadyAssigned) {
+                const assignedOrderModel = new AssignedOrderModel();
+                assignedOrderModel.order = req.body.order;
+                assignedOrderModel.userBy = req.currentUser._id;
+                assignedOrderModel.userTo = req.body.userTo;
+                assignedOrderModel.assignedDate = req.body.assignedDate;
+                assignedOrderModel.save();
+                let assignedOrderResponce = {
+                    id: assignedOrderModel._id
+                }
+                let result = makeApiResponce('Assigned project to user created successfully', 1, OK, assignedOrderResponce);
+                return res.json(result);
+               }else{
+                    let result = makeApiResponce('Project is already assigned to user', 0, NOT_FOUND);
+                    return res.status(NOT_FOUND).json(result)
+                }
+           }else{
+                let result = makeApiResponce('Invalid UserTo/Order', 0, NOT_FOUND);
+                return res.status(NOT_FOUND).json(result)
+           }
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async listOfScheduledContractorProjects(req, res){
+        const currentUserId = req.currentUser._id;
+        try{
+            const getScheduledOrders = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {orderAccepted: { $ne: null }, orderStatus:'Scheduled',requestStatus:'Accepted'}
+                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderdetails',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             as: 'orderdetails'
+                    //         }
+                    // },
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                "pipeline": [
+                                    {
+                                        $match: {user: currentUserId}
+                                    },
+                                    {"$project": {"user": 1, "statusBit": 1}}
+                                ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+            if(!getScheduledOrders){
+                let result = makeApiResponce('Empty list of Scheduled Projects', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            
+            let result = makeApiResponce('List of Scheduled Projects', 1, OK, getScheduledOrders);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+    async getUserAllStatusBit(req, res){
+        try{
+            const getAllStatusBit = await UserModel.findById(req.params.id);
+            if(!getAllStatusBit){
+                let result = makeApiResponce('Empty customer stripe card detail', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Detail', 1, OK, getAllStatusBit);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async updateUserStatusBit(req, res) {
+        try {
+            const findUser = await UserModel.findById(req.params.id);
+            if (!findUser) {
+                let result = makeApiResponce('This email address does not have an account.', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            // UPDATE THE USER            
+            findUser.newMessageFromCustomerNoti = req.body.newMessageFromCustomerNoti
+            findUser.newOrder = req.body.newOrder
+            findUser.upcomingDelivery = req.body.upcomingDelivery
+            findUser.newMessageFromCustomerEmail = req.body.newMessageFromCustomerEmail
+            findUser.projectUpdates = req.body.projectUpdates
+            findUser.cancellation = req.body.cancellation
+            findUser.rescheduleRequest = req.body.rescheduleRequest
+            findUser.reminders = req.body.reminders
+
+            await findUser.save();
+
+            let userResponce = {
+                userData: findUser
+            }
+            let result = makeApiResponce('Update Successfully', 1, OK, userResponce);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+    async updateStaff(req, res) {
+        try {
+
+            const userModel = await UserModel.findById(req.params.id);
+            if (!userModel) {
+                let result = makeApiResponce('Not found.', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            let image='';
+            if (req.files[0]!== undefined) {
+                image = req.files[0].filename;
+            }
+             
+            userModel.firstName = req.body.firstName;
+            userModel.email = req.body.email;
+            userModel.phoneNumber = req.body.phoneNumber;
+            userModel.accountType = req.body.accountType;
+            userModel.userType = req.body.userType;
+            
+
+            if (req.files[0]!== undefined) {
+                userModel.profileImage = image;
+            }
+            userModel.save();
+            let responce = {
+                id: userModel._id
+            }
+            
+            let result = makeApiResponce('Successfully', 1, OK, responce);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+    async listofTransactions(req, res) {
+        const currentUserId = req.currentUser._id;
+        try{
+            const getTransactions = await OrderModel.aggregate(
+                    [
+                        {
+                        $match: {orderAccepted: { $ne: null }, requestStatus:'Accepted' }
+                        },
+                    
+                        {
+                            $lookup: {
+                                from: "orderdetails",
+                                localField: "_id",
+                                foreignField: "order",
+                                as: "orderdetails",
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "properties",
+                                            localField: "property",
+                                            foreignField: "_id",
+                                            as: "property"
+                                        },
+                                    },
+                                    // { $unwind: "$property" }, mondatroy
+                                    { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                    {
+                                        $lookup: {
+                                            from: "services",
+                                            localField: "service",
+                                            foreignField: "_id",
+                                            as: "service"
+                                        },
+                                    },
+                                    { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                    // {
+                                    //     $unwind: "$property" if mandatory
+                                    // }
+                                ],
+                            }
+                        },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                "pipeline": [
+                                    {
+                                        $match: {user: currentUserId}
+                                    },
+                                    {"$project": {"user": 1, "statusBit": 1}}
+                                ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    {
+                        $unwind: '$orderaccepteds'
+                    },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+            if(!getTransactions){
+                let result = makeApiResponce('Empty list of Active Projects', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('List of Transactions', 1, OK, getTransactions);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+    async listOfContractors(req, res){
+
+        // console.log(req.currentUser.company);
+        // return ;
+
+
+        try{
+            let listOfContractors  = await UserModel.aggregate(
+                [
+                    {
+                        $match: {company:req.currentUser.company, accountType : 'standard_contractor',delBit:false}
+                    },
+                    // {
+                    //     $lookup: {
+                    //         from: "orderdetails",
+                    //         localField: "_id",
+                    //         foreignField: "order",
+                    //         as: "orderdetails",
+                    //         pipeline: [
+                    //             {
+                    //                 $lookup: {
+                    //                     from: "properties",
+                    //                     localField: "property",
+                    //                     foreignField: "_id",
+                    //                     as: "property"
+                    //                 },
+                    //             },
+                    //             // { $unwind: "$property" }, mondatroy
+                    //             { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                    //             {
+                    //                 $lookup: {
+                    //                     from: "services",
+                    //                     localField: "service",
+                    //                     foreignField: "_id",
+                    //                     as: "service"
+                    //                 },
+                    //             },
+                    //             { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+                    //
+                    //             // {
+                    //             //     $unwind: "$property" if mandatory
+                    //             // }
+                    //         ],
+                    //     }
+                    // },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+
+            if(!listOfContractors){
+                let result = makeApiResponce('Empty list of Contractors', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            let result = makeApiResponce('Listing of Contractors', 1, OK, listOfContractors);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    }
 };
 
 

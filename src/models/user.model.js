@@ -76,6 +76,10 @@ const UserSchema = new Schema({
             default: [0, 0]
         }
     },
+    stripeCustomerId: {
+        type: String,
+        default: null
+    },
     statusBit: {
       type: Boolean,
       default: true
@@ -96,10 +100,46 @@ const UserSchema = new Schema({
       type: String,
       default: 'standard_contractor',
     },
+    newMessageFromCustomerNoti: {
+      type: Boolean,
+      default: false
+    },
+    newOrder: {
+      type: Boolean,
+      default: false
+    },
+    upcomingDelivery: {
+      type: Boolean,
+      default: false
+    },
+    newMessageFromCustomerEmail: {
+      type: Boolean,
+      default: false
+    },
+    projectUpdates: {
+      type: Boolean,
+      default: false
+    },
+    cancellation: {
+      type: Boolean,
+      default: false
+    },
+    rescheduleRequest: {
+      type: Boolean,
+      default: false
+    },
+    reminders: {
+      type: Boolean,
+      default: false
+    },
+    fcmToken: {
+      type: String,
+      default: null
+    },
   },
   { timestamps: true }
   );
 
 UserSchema.index({ location: '2dsphere' });
 
-export default mongoose.model('users', UserSchema);
+export default mongoose.model('User', UserSchema);

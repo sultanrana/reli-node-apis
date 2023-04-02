@@ -46,4 +46,4 @@ const SystemVariableSchema = new Schema({
   { timestamps: true }
   );
 
-export default mongoose.model('System_Variable', SystemVariableSchema);
+export default mongoose.model('SystemVariable', SystemVariableSchema);

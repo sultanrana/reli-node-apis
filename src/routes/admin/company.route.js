@@ -10,3 +10,4 @@ companyRouter.post('/add', upload.any(), passport.authenticate('jwt', { session:
 companyRouter.post('/update/:id',upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), companyController.update);
 companyRouter.get('/detail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), companyController.detail);
 companyRouter.delete('/delete/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), companyController.delete);
+companyRouter.get('/companyDetail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), companyController.companyDetail);

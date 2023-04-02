@@ -72,7 +72,75 @@ export default {
         try {
             const findCustomer = await UserModel.findOne({_id:req.params.id, delBit: false, userType: "customer"});
             let getProperties =  await PropertyModel.find({user : findCustomer._id});
-            let getOrders =  await OrderModel.find({user : findCustomer._id});
+           // let getOrders =  await OrderModel.find({user : findCustomer._id});
+
+            const getOrders = await OrderModel.aggregate(
+                [
+                    {
+                        $match: {user : findCustomer._id}
+                    },
+
+                    {
+                        $lookup: {
+                            from: "orderdetails",
+                            localField: "_id",
+                            foreignField: "order",
+                            as: "orderdetails",
+                            pipeline: [
+                                {
+                                    $lookup: {
+                                        from: "properties",
+                                        localField: "property",
+                                        foreignField: "_id",
+                                        as: "property"
+                                    },
+                                },
+                                // { $unwind: "$property" }, mondatroy
+                                { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $lookup: {
+                                        from: "services",
+                                        localField: "service",
+                                        foreignField: "_id",
+                                        as: "service"
+                                    },
+                                },
+                                { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                                // {
+                                //     $unwind: "$property" if mandatory
+                                // }
+                            ],
+                        }
+                    },
+                    {
+                        $lookup:
+                            {
+                                from: 'orderaccepteds',
+                                localField: '_id',
+                                foreignField: 'order',
+                                "pipeline": [
+                                    // {
+                                    //     $match: {user: currentUserId}
+                                    // },
+                                    {"$project": {"user": 1, "statusBit": 1}}
+                                ],
+                                as: 'orderaccepteds',
+                            },
+                    },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
+                    {
+                        $sort: { createdAt: -1 }
+                    }
+
+                ]
+            );
+
+
+
+
             if (!findCustomer) {
                 let result = makeApiResponce('Customer not found.', 1, BAD_REQUEST)
                 return res.status(BAD_REQUEST).json(result);

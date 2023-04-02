@@ -7,19 +7,48 @@ const ProductSchema = new Schema({
         ref: 'User',
         required: true
     },
-    name: {
-      type: String,
-      default: null
-    },
-    description: {
-      type: String,
-      default: null
-    },
     service: {
+        type: Schema.Types.ObjectId,
+        ref: 'Service',
+        required: true
+    },
+    product_id: {
+      type: String,
+      default: null
+    },
+    job_type: {
+      type: String,
+      default: null
+    },
+    color: {
           type: String,
           default: null,
     },
-    code: {
+    grid: {
+        type: String,
+        default: null,
+    },
+    open_type: {
+        type: String,
+        default: null,
+    },
+    tempered_glass: {
+        type: String,
+        default: null,
+    },
+    privacy: {
+        type: String,
+        default: null,
+    },
+    safety_glass: {
+        type: String,
+        default: null,
+    },
+    dimension_class: {
+        type: String,
+        default: null,
+    },
+    price: {
         type: String,
         default: null,
     },

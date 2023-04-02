@@ -20,12 +20,12 @@ async login(req, res){
             const userQuery = { email: req.body.email };
             let user =  await UserModel.findOne(userQuery);
             if(!user){
-                let result = makeApiResponce('Invalid Email and Passowrd', 1, BAD_REQUEST)
+                let result = makeApiResponce('Please check your email and password', 1, BAD_REQUEST)
                 return res.status(BAD_REQUEST).json(result);
             }
             const matched = await bcryptjs.compare(req.body.password, user.password)
             if(!matched){
-                let result = makeApiResponce('invalid Credential', 1, BAD_REQUEST)
+                let result = makeApiResponce('Please check your email and password', 1, BAD_REQUEST)
                 return res.status(BAD_REQUEST).json(result);
             }
             
@@ -60,7 +60,7 @@ async passwordReset(req, res) {
         
     const findUser = await UserModel.findOne({ email: req.body.email });
         if (!findUser) {
-            let result = makeApiResponce('User not found.', 1, BAD_REQUEST)
+            let result = makeApiResponce('Please double-check the email you entered is correct.', 1, BAD_REQUEST)
             return res.status(BAD_REQUEST).json(result);
         }
 
@@ -86,7 +86,7 @@ async forgotPassword(req, res) {
         const randomForgotOTP = await randomValueHex("6");
         const findUser = await UserModel.findOne({ email: req.body.email });
         if (!findUser) {
-            let result = makeApiResponce('User not found.', 1, BAD_REQUEST)
+            let result = makeApiResponce('Please double-check the email you entered is correct.', 1, BAD_REQUEST)
             return res.status(BAD_REQUEST).json(result);
         }
 

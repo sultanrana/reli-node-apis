@@ -93,6 +93,10 @@ const Order = new Schema({
         required: true,
         default: 'Pending'
     },
+    orderStatusDate:{
+        type:Date,
+        default: null
+    },
     requestStatus:{
         type: String,
         required: true,
@@ -102,6 +106,22 @@ const Order = new Schema({
         type:String,
         default:null
     }],
+    stripeRefundId:{
+        type:String,
+        default:null
+    },
+    stripeBalanceTransactionId:{
+        type:String,
+        default:null
+    },
+    refundAmount:{
+        type: Number,
+        default: null,
+    },
+    refundDate:{
+        type:Date,
+        default: null
+    },
     delBit: {
             type: Boolean,
             default: false,

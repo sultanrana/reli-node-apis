@@ -7,7 +7,7 @@ order: {
         ref: 'Order',
         required: true
     },
-serviceId: {
+service: {
         type: Schema.Types.ObjectId,
         ref: 'Service',
         required: true
@@ -20,7 +20,7 @@ serviceType: {
         type: String,
         default: null
     },
-propertyId: {
+property: {
         type: Schema.Types.ObjectId,
         ref: 'Property',
         required: true
@@ -101,4 +101,4 @@ delBit: {
     { timestamps: true }
         );
 
-export default mongoose.model('Order_Detail', OrderDetail);
+export default mongoose.model('OrderDetail', OrderDetail);

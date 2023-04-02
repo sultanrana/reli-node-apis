@@ -4,21 +4,17 @@ import { restRouter } from './base/index';
 import { configureDb } from './config/db.js';
 import { setGlobalmiddleware } from './middlewares/global-middleware';
 import path from 'path';
-import cors from 'cors';
 
 configureDb();
 
-var app = express();
-
-app.use(cors({ origin: true }));
-
+const app = express();
 
 app.use(express.static(path.join(__dirname, 'uploads/images')));
 
 // REGISTER  GLOBAL MIDDLEWAREs
 setGlobalmiddleware(app);
-
-app.use('/api', restRouter);
+ 
+app.use('/', restRouter);
 
 // handler the the UNAUTORIZED 
 app.use('/failure', (req, res, next) => {

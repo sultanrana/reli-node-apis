@@ -19,9 +19,17 @@ export default {
                           .on("data", function(data) {
                               csvData.push({
                                   "user":req.currentUser,
-                                  name: data[0],
-                                  description: data[1],
-                                  price: data[2]
+                                  "service":req.body.service,
+                                  product_id: data[0],
+                                  job_type: data[1],
+                                  color: data[2],
+                                  grid: data[3],
+                                  open_type: data[4],
+                                  tempered_glass: data[5],
+                                  privacy: data[6],
+                                  safety_glass: data[7],
+                                  dimension_class: data[8],
+                                  price: data[9]
                               });
                           })
                           .on("end", function() {
@@ -38,6 +46,24 @@ export default {
                       let userResponce = {};
                       let result = makeApiResponce('Products have been successfully imported', 1, OK, userResponce);
                       return res.json(result);
+    },
+
+    async getProducts(req, res){
+        try{
+            
+            let get_products =  await productModel.find({service:req.params.id});
+            if(!get_products){
+                let result = makeApiResponce('Empty list coupon', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Coupon Listing', 1, OK, get_products);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
     },
 
   async exportCsv(req, res){

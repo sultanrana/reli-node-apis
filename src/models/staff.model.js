@@ -29,8 +29,8 @@ const StaffSchema = new Schema({
         default: null,
     },
     approvedByReli: {
-      type: Boolean,
-      default: true,
+      type: String,
+        default: null,
     },
     status: {
       type: Boolean,

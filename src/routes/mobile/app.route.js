@@ -40,7 +40,27 @@ appRouter.get('/contractorDashboard', passport.authenticate('jwt', { session: fa
 appRouter.get('/listOfActiveContractorProjects', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfActiveContractorProjects);
 appRouter.get('/listOfAvailableContractorProjects', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfAvailableContractorProjects);
 appRouter.get('/listOfCompletedContractorProjects', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfCompletedContractorProjects);
-appRouter.post('/changeProjectRequestStatus/:id',upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.changeProjectRequestStatus);
-appRouter.post('/changeProjectOrderStatus/:id', upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.changeProjectOrderStatus);
+appRouter.post('/changeProjectRequestStatus/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.changeProjectRequestStatus);
+appRouter.post('/changeProjectOrderStatus/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.changeProjectOrderStatus);
+appRouter.get('/listOfStaff/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfStaff);
+appRouter.get('/listOfScheduledContractorProjects', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfScheduledContractorProjects);
 
 
+
+
+appRouter.get('/listOfNotifications', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfNotifications);
+appRouter.post('/addNotification', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.addNotification);
+appRouter.get('/notificationDetail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.notificationDetail);
+
+appRouter.post('/assignProjectToUser', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.assignProjectToUser);
+appRouter.get('/listOfContractors', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfContractors);
+
+appRouter.post('/addCustomerStripeCard', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.addCustomerStripeCard);
+appRouter.get('/listOfCustomerStripeCards', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfCustomerStripeCards);
+appRouter.get('/customerStripeCardDetail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.customerStripeCardDetail);
+
+appRouter.get('/getUserAllStatusBit/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.getUserAllStatusBit);
+appRouter.put('/updateUserStatusBit/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.updateUserStatusBit);
+
+appRouter.put('/updateStaff/:id',upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.updateStaff);
+appRouter.get('/listofTransactions', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listofTransactions);
