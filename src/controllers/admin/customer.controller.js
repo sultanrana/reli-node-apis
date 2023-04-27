@@ -154,7 +154,7 @@ export default {
                 phoneNumber: findCustomer.phoneNumber,
                 userType: findCustomer.userType,
                 statusBit: findCustomer.statusBit,
-                profileImage :url + "/src/uploads/images/userImage/"+findCustomer.profileImage,
+                profileImage : findCustomer.profileImage,
                 properties:getProperties,
                 orders:getOrders
 

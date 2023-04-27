@@ -8,3 +8,4 @@ export const csvRouter =  express.Router();
 csvRouter.post('/upload-csv',upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), csvController.uploadCsv);
 csvRouter.get('/export-csv', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), csvController.exportCsv);
 csvRouter.get('/getProducts/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), csvController.getProducts);
+csvRouter.post('/update/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), csvController.update);

@@ -16,9 +16,10 @@ import mongoose from 'mongoose';
 import NotificationModel from "../../models/notification.model";
 import AssignedOrderModel from "../../models/assignedOrder.model";
 import UserStripeCardModel from "../../models/userStripeCard.model";
+import ActivityLogModel from "../../models/activityLog.model";
+
 import fcmNode from "fcm-node";
 const FCM = require('../../libraries/notifications.js');
-
 
 // Setup Stripe
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -78,6 +79,16 @@ export default {
 
                user.stripeCustomerId = customer.id;
                await user.save();
+
+
+               const passwordLinkNewUser = `
+                <p>${req.body.firstName},</p><p>Welcome to Reli, the easiest system for home repairs!</p><p>Reli is a company dedicated to making home repairs simple.</p>`;
+                // node mailer
+                    const mailResponceNewUser = await sendEmail({
+                        html: passwordLinkNewUser,
+                        subject: `Welcome to the Reli System`,
+                        email: req.body.email,
+                    });
            }
 
 
@@ -137,17 +148,6 @@ export default {
                     const findUser = await UserModel.findById(user._id);
                     findUser.fcmToken = req.body.fcmToken;
                     await findUser.save();
-
-                    // FCM.push_notification("Fundraiser goal", `Congratulations!.`, req.body.fcmToken, 12);
-
-                    // let Noti = new Notification({
-                    //     receiverId: Found.userId._id,
-                    //     notificationText: `Congratulations! ${Found.title} has reached ${avg}% of its goal.`,
-                    //     module_id: 'Charity',
-                    //     module_value: charityPayment._id
-                    //   });
-                    //   await Noti.save();
-
 
                     let result = makeApiResponce('LoggedIn Successfully', 1, OK, userResponce);
                     return res.json(result);       
@@ -378,11 +378,11 @@ export default {
             await findUser.save();
 
             const passwordLink = `
-            <p>Here is your new password <span style="font-weight:bold">${randomForgotOTP}</span> login with and then change your password</a></p>`;
+            <p>${findUser.firstName},</p><p>A request has been received to change the password for your Reli account.</p><p>Here is your verification code to reset your password: <span style="font-weight:bold">${randomForgotOTP}</span> </p>`;
             // node mailer
                 const mailResponce = await sendEmail({
                     html: passwordLink,
-                    subject: "Forgot Password",
+                    subject: `${findUser.firstName}, your requested password update`,
                     email: req.body.email,
                 });
             
@@ -881,6 +881,17 @@ export default {
          let orderResponce = {
              id: newOrderModel._id
          }
+
+
+        const activityLogModelData = new ActivityLogModel();
+        activityLogModelData.title = 'Project Created';
+        activityLogModelData.message = 'Your project has been created';
+        activityLogModelData.type = 'Project created';
+        activityLogModelData.order = newOrderModel._id;
+        activityLogModelData.user = req.currentUser._id;
+        activityLogModelData.save();
+
+
          let result = makeApiResponce('property Created Successfully', 1, OK, orderResponce);
          return res.json(result);
 
@@ -1263,6 +1274,21 @@ export default {
                     {
                         $lookup:
                             {
+                                from: 'users',
+                                localField: 'user',
+                                foreignField: '_id',
+                                // "pipeline": [
+                                //     {
+                                //         $match: {user: currentUserId}
+                                //     },
+                                //     {"$project": {"user": 1, "statusBit": 1}}
+                                // ],
+                                as: 'user',
+                            },
+                    },
+                    {
+                        $lookup:
+                            {
                                 from: 'orderaccepteds',
                                 localField: '_id',
                                 foreignField: 'order',
@@ -1521,6 +1547,77 @@ export default {
         try{
             // orders that has requestStatus=Pending
             let getClaimOrders = await OrderModel.aggregate(
+                // [
+                //     {
+                //         $match: {orderStatus:'Pending',requestStatus:'Pending'}
+                //     },
+                //     // {
+                //     //     $lookup:
+                //     //         {
+                //     //             from: 'orderdetails',
+                //     //             localField: '_id',
+                //     //             foreignField: 'order',
+                //     //             as: 'orderdetails'
+                //     //         }
+                //     // },
+                //     {
+                //         $lookup: {
+                //             from: "orderdetails",
+                //             localField: "_id",
+                //             foreignField: "order",
+                //             as: "orderdetails",
+                //             pipeline: [
+                //                 {
+                //                     $lookup: {
+                //                         from: "properties",
+                //                         localField: "property",
+                //                         foreignField: "_id",
+                //                         as: "property"
+                //                     },
+                //                 },
+                //                 // { $unwind: "$property" }, mondatroy
+                //                 { $unwind: { path: '$property', preserveNullAndEmptyArrays: true } },
+                //                 {
+                //                     $lookup: {
+                //                         from: "services",
+                //                         localField: "service",
+                //                         foreignField: "_id",
+                //                         as: "service"
+                //                     },
+                //                 },
+                //                 { $unwind: { path: '$service', preserveNullAndEmptyArrays: true } },
+
+                //                 // {
+                //                 //     $unwind: "$property" if mandatory
+                //                 // }
+                //             ],
+                //         }
+                //     },
+                //     {
+                //         $lookup:
+                //             {
+                //                 from: 'orderaccepteds',
+                //                 localField: '_id',
+                //                 foreignField: 'order',
+                //                 // "pipeline": [
+                //                 //     {
+                //                 //         $match: {user: currentUserId}
+                //                 //     },
+                //                 //     {"$project": {"user": 1, "statusBit": 1}}
+                //                 // ],
+                //                 as: 'orderaccepteds',
+                //             },
+                //     },
+                //     {
+                //         $unwind: '$orderaccepteds'
+                //     },
+                //     {
+                //         $sort: { createdAt: -1 }
+                //     }
+
+                // ]
+
+
                 [
                     {
                         $match: {orderStatus:'Pending',requestStatus:'Pending'}
@@ -1582,9 +1679,9 @@ export default {
                                 as: 'orderaccepteds',
                             },
                     },
-                    {
-                        $unwind: '$orderaccepteds'
-                    },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
                     {
                         $sort: { createdAt: -1 }
                     }
@@ -1960,6 +2057,7 @@ export default {
 
     async changeProjectRequestStatus(req, res) {
         try {
+
             const findOrder = await OrderModel.findOne({_id:req.params.id, orderStatus:'Pending', requestStatus:'Pending', delBit: false});
             if (!findOrder) {
                 let result = makeApiResponce('Project not found.', 1, BAD_REQUEST)
@@ -1983,6 +2081,60 @@ export default {
             let orderResponce = {
                 id: findOrder._id
             }
+
+
+            const activityLogModelData = new ActivityLogModel();
+            activityLogModelData.title = 'Project Accepted';
+            activityLogModelData.message = 'Your project has been accepted';
+            activityLogModelData.type = 'Change Project Status like accepted';
+            activityLogModelData.order = req.params.id;
+            activityLogModelData.user = req.currentUser._id;
+            activityLogModelData.save();
+
+
+            let getDataNoti = await OrderModel.findOne({ _id: req.params.id }).populate("user");
+            let fcmToken = getDataNoti.user.fcmToken; 
+            FCM.push_notification("Project Accepted", `Your project ${req.params.id} has been accepted`, fcmToken, 12);
+            // // console.log(fcmToken);
+            const notificationModel = new NotificationModel();
+            notificationModel.user = mongoose.Types.ObjectId(getDataNoti.user._id);
+            notificationModel.title = "Project Accepted";
+            notificationModel.body = `Your project ${req.params.id} has been accepted`;
+            notificationModel.type = "Project Accepted";
+            notificationModel.deviceToken = fcmToken;
+            notificationModel.save();
+
+
+            if(req.body.requestStatus === 'Accepted'){
+                const passwordLinkAccp = `
+                <p>${getDataNoti.user.firstName},</p><p>Your project ${req.params.id} has been accepted </p>`;
+                // node mailer
+                    const mailResponceAccp = await sendEmail({
+                        html: passwordLinkAccp,
+                        subject: `Project Accepted`,
+                        email: getDataNoti.user.email,
+                    });
+            } else if(req.body.requestStatus === 'Rejected'){
+                const passwordLinkRej = `
+                <p>${getDataNoti.user.firstName},</p><p>Your project ${req.params.id} has been rejected </p>`;
+                // node mailer
+                    const mailResponceRej = await sendEmail({
+                        html: passwordLinkRej,
+                        subject: `Project Rejected`,
+                        email: getDataNoti.user.email,
+                    });
+            } else {
+                const passwordLinkRev = `
+                <p>${getDataNoti.user.firstName},</p><p>Your project ${req.params.id} has been review </p>`;
+                // node mailer
+                    const mailResponceRev = await sendEmail({
+                        html: passwordLinkRev,
+                        subject: `Project Review`,
+                        email: getDataNoti.user.email,
+                    });
+            }
+
+
             let result = makeApiResponce('Project request status updated successfully', 1, OK, orderResponce);
             return res.json(result);
 
@@ -2010,7 +2162,57 @@ export default {
 
             findOrder.orderStatus = req.body.orderStatus;
             findOrder.orderStatusDate = Date.now();
-            // await findOrder.save();
+            await findOrder.save();
+
+            let activityLogTitle = '';
+            let activityLogMessage = '';
+            let activityLogType = '';
+
+            if (req.body.orderStatus == 'Completed') {
+                activityLogTitle = 'Project Completed';
+                activityLogMessage = 'Your project has been completed';
+                activityLogType = 'Change Project Status like Completed ';
+            } else if (req.body.orderStatus == 'Scheduled') {
+                activityLogTitle = 'Project Scheduled';
+                activityLogMessage = 'your project has been scheduled';
+                activityLogType = 'Change Project Status like Scheduled ';
+            } else if (req.body.orderStatus == 'Enroute') {
+                activityLogTitle = 'Project Enroute';
+                activityLogMessage = 'your contractor is on the way';
+                activityLogType = 'Change Project Status like Enroute ';
+            } else if (req.body.orderStatus == 'Arrived') {
+                activityLogTitle = 'Project Arrived';
+                activityLogMessage = 'your contractor has arrived';
+                activityLogType = 'Change Project Status like Arrived ';
+            } else if (req.body.orderStatus == 'Assigned') {
+                activityLogTitle = 'Project Assigned';
+                activityLogMessage = 'You have been assigned as the contractor for project';
+                activityLogType = 'Change Project Status like Assigned ';
+            } else if (req.body.orderStatus == 'Unassigned') {
+                activityLogTitle = 'Project Unassigned';
+                activityLogMessage = 'your contractor has unassigned';
+                activityLogType = 'Change Project Status like Unassigned ';
+            } else if (req.body.orderStatus == 'Ordered') {
+                activityLogTitle = 'Project Ordered';
+                activityLogMessage = 'your contractor has ordered';
+                activityLogType = 'Change Project Status like Ordered ';    
+            } else {
+                activityLogTitle = 'Project Status';
+                activityLogMessage = '';
+                activityLogType = 'Change Project Status like No Chnage ';
+            }
+
+
+            const activityLogModelData = new ActivityLogModel();
+            activityLogModelData.title = activityLogTitle;
+            activityLogModelData.message = activityLogMessage;
+            activityLogModelData.type = activityLogType;
+            activityLogModelData.order = req.params.id;
+            activityLogModelData.user = req.currentUser._id;
+            // console.log(req.currentUser._id);
+            // return false;
+            activityLogModelData.save();
+
 
             let getDataNoti;
             if (req.body.orderStatus == 'Completed') {
@@ -2026,6 +2228,15 @@ export default {
                 notificationModel.deviceToken = fcmToken;
                 notificationModel.save();
 
+                const passwordLink = `
+                <p>${getDataNoti.user.firstName},</p><p>Your contractor has completed the project ${req.params.id} !</p>`;
+            // node mailer
+                const mailResponce = await sendEmail({
+                    html: passwordLink,
+                    subject: `Your project has been completed`,
+                    email: getDataNoti.user.email,
+                });
+
                 let orderAccepted = getDataNoti.orderAccepted; 
                 // console.log(getDataNotiCon);
                 let getDataNotiCon = await OrderAcceptedModel.findOne({ _id: orderAccepted }).populate("user");
@@ -2039,6 +2250,15 @@ export default {
                 notificationModelContractor.type = "Project Completed";
                 notificationModelContractor.deviceToken = fcmTokenContractor;
                 notificationModelContractor.save();
+
+                const passwordLinkCont = `
+                <p>Your project ${req.params.id} has completed!</p>`;
+            // node mailer
+                const mailResponceCont = await sendEmail({
+                    html: passwordLinkCont,
+                    subject: `Your project has been completed`,
+                    email: getDataNotiCon.user.email,
+                });
             }
 
 
@@ -2057,6 +2277,17 @@ export default {
                 notificationModel.deviceToken = fcmTokenCusSch;
                 notificationModel.save();
 
+
+
+                const passwordLinkSched = `
+                <p>${getDataNoti.user.firstName},</p><p>Your project has a new scheduled date for your project ${req.params.id} !</p>`;
+            // node mailer
+                const mailResponceSched = await sendEmail({
+                    html: passwordLinkSched,
+                    subject: `Your project has been scheduled`,
+                    email: getDataNoti.user.email,
+                });
+
             }
 
 
@@ -2073,6 +2304,16 @@ export default {
                 notificationModel.type = "Contractor on the Way";
                 notificationModel.deviceToken = fcmTokenCusEnr;
                 notificationModel.save();
+
+
+                const passwordLinkEnr = `
+                <p>${getDataNoti.user.firstName},</p><p>Your contractor is on their way for your project ${req.params.id} !</p>`;
+            // node mailer
+                const mailResponceEnr = await sendEmail({
+                    html: passwordLinkEnr,
+                    subject: `Your project contractor is on their way`,
+                    email: getDataNoti.user.email,
+                });
 
             }
 
@@ -2091,6 +2332,16 @@ export default {
                 notificationModel.deviceToken = fcmTokenCusArr;
                 notificationModel.save();
 
+
+                const passwordLinkArr = `
+                <p>${getDataNoti.user.firstName},</p><p>Your contractor has arrived at the property address for your project ${req.params.id} !</p>`;
+            // node mailer
+                const mailResponceArr = await sendEmail({
+                    html: passwordLinkArr,
+                    subject: `Your project contractor has arrived`,
+                    email: getDataNoti.user.email,
+                });
+
             }
 
 
@@ -2107,6 +2358,16 @@ export default {
                 notificationModelContractor.type = "Project Assignment";
                 notificationModelContractor.deviceToken = fcmTokenContractorAss;
                 notificationModelContractor.save();
+
+                const passwordLinkAss = `
+                <p>${getDataNoti.userTo.firstName},</p><p>You have been assigned to a new Project ${req.params.id} !</p>`;
+            // node mailer
+                const mailResponceAss = await sendEmail({
+                    html: passwordLinkAss,
+                    subject: `“New Project Assigned`,
+                    email: getDataNoti.userTo.email,
+                });
+
             }
 
             let orderResponce = {

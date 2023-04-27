@@ -15,4 +15,4 @@ projectRouter.get('/detail/:id', passport.authenticate('jwt', { session: false, 
 //projectRouter.delete('/delete/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), customerController.delete);
 
 projectRouter.get('/projectDetail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), projectController.projectDetail);
-
+projectRouter.post('/changeProjectStatus/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), projectController.changeProjectStatus);

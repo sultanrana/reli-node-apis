@@ -21,7 +21,7 @@ import { makeApiResponce } from '../../libraries/responce';
                              service: doc.service,
                              couponCode: doc.code,
                              statusBit: doc.statusBit,
-                             image :url + "/src/uploads/images/couponImage/"+doc.image
+                             image : doc.image
                          });
                      });
                      let couponResponce = couponRecord;
@@ -154,7 +154,7 @@ import { makeApiResponce } from '../../libraries/responce';
                  service: findCoupon.service,
                  couponCode: findCoupon.code,
                  statusBit: findCoupon.statusBit,
-                 image :url + "/src/uploads/images/couponImage/"+findCoupon.image
+                 image : findCoupon.image
              }
              let result = makeApiResponce('Coupon Detail', 1, OK, couponResponce);
              return res.json(result);

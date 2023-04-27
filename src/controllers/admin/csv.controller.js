@@ -103,4 +103,31 @@ export default {
       })
   },
 
+
+  async update(req, res) {
+         try {
+
+             const productData = await productModel.findById(req.params.id);
+             if (!productData) {
+                 let result = makeApiResponce('Not found.', 1, BAD_REQUEST)
+                 return res.status(BAD_REQUEST).json(result);
+             }
+                         console.log(req.body.price);
+            productData.price = req.body.price;
+            
+            productData.save();
+            let responce = {
+                    id: productData._id
+            }
+            
+            let result = makeApiResponce('Successfully', 1, OK, responce);
+            return res.json(result);
+
+         }catch(err){
+             console.log(err);
+             let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+             return res.status(INTERNAL_SERVER_ERROR).json(result)
+         }
+     },
+
 };

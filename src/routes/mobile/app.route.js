@@ -19,7 +19,7 @@ appRouter.put('/updatePhoneNumber/:id', passport.authenticate('jwt', { session: 
 appRouter.put('/updateAccountDetail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.updateAccountDetail);
 appRouter.put('/updateLocation/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.updateLocation);
 appRouter.delete('/deleteAccount/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.deleteAccount);
-appRouter.get('/getAllServices', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.getAllServices);
+appRouter.get('/getAllServices', appController.getAllServices);
 appRouter.get('/createCart', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.createCart);
 
 appRouter.get('/listing', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listing);

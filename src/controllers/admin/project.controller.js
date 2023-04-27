@@ -68,24 +68,24 @@ export default {
                             ],
                         }
                     },
-                    {
-                        $lookup:
-                            {
-                                from: 'orderaccepteds',
-                                localField: '_id',
-                                foreignField: 'order',
-                                "pipeline": [
-                                    // {
-                                    //     $match: {user: currentUserId}
-                                    // },
-                                    {"$project": {"user": 1, "statusBit": 1}}
-                                ],
-                                as: 'orderaccepteds',
-                            },
-                    },
-                    {
-                        $unwind: '$orderaccepteds'
-                    },
+                    // {
+                    //     $lookup:
+                    //         {
+                    //             from: 'orderaccepteds',
+                    //             localField: '_id',
+                    //             foreignField: 'order',
+                    //             "pipeline": [
+                    //                 // {
+                    //                 //     $match: {user: currentUserId}
+                    //                 // },
+                    //                 {"$project": {"user": 1, "statusBit": 1}}
+                    //             ],
+                    //             as: 'orderaccepteds',
+                    //         },
+                    // },
+                    // {
+                    //     $unwind: '$orderaccepteds'
+                    // },
                     {
                         $sort: { createdAt: -1 }
                     }
@@ -286,6 +286,38 @@ export default {
                     let result = makeApiResponce('Successfully', 1, OK, finalArray);
                     return res.json(result);
                 }
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+        async changeProjectStatus(req, res) {
+        try {
+            // console.log(req.params.id);
+            const findOrder = await OrderModel.findById(req.params.id);
+
+            // const findOrder = await OrderModel.findOne({_id: req.params.id});
+            // console.log(findOrder);
+            if (!findOrder) {
+                let result = makeApiResponce('Project not found.', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+
+            findOrder.orderStatus = req.body.orderStatus;
+            findOrder.orderStatusDate = Date.now();
+            await findOrder.save();
+
+
+            let orderResponce = {
+                id: findOrder._id
+            }
+
+            let result = makeApiResponce('Project status updated successfully', 1, OK, orderResponce);
+            return res.json(result);
 
         }catch(err){
             console.log(err);

@@ -77,7 +77,7 @@ export default {
                     representativeNumber:doc.representativeNumber,
                     representativeEmail: doc.representativeEmail,
                     services: doc.services,
-                    image :url + "/src/uploads/images/"+doc.image,
+                    image : doc.image,
                     statusBit:doc.statusBit,
                     delBit: doc.delBit,
 
@@ -490,7 +490,7 @@ export default {
                     representativeNumber:findCompany.representativeNumber,
                     representativeEmail: findCompany.representativeEmail,
                     services: findCompany.services,
-                    image :url + "/src/uploads/images/"+findCompany.image,
+                    image : findCompany.image,
                     statusBit:findCompany.statusBit,
                     delBit: findCompany.delBit,
 

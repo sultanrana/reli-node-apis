@@ -97,12 +97,14 @@ async forgotPassword(req, res) {
         await findUser.save();
 
         const passwordLink = `
-        <p>Here is your new password <span style="font-weight:bold">${randomForgotOTP}</span> login with and then change your password</a></p>
-        <p><a href="http://localhost:3000/confirm-password">Enter the reset password code here</a></p>`;
+        <p>${findUser.firstName},</p>
+        <p>A request has been received to change the password for your Reli account.</p>
+        <p>Here is your verification code to reset your password: <span style="font-weight:bold">${randomForgotOTP}</span></p>
+        <p><a href="http://34.236.149.254/confirm-password">Click here to reset your password and login.</a></p>`;
         // node mailer
             const mailResponce = await sendEmail({
                 html: passwordLink,
-                subject: "Forgot Password",
+                subject: `${findUser.firstName}, your requested password update`,
                 email: req.body.email,
             });
         
@@ -164,7 +166,8 @@ async listing(req, res) {
                         lastName: doc.lastName,
                         email: doc.email,
                         userType: doc.userType,
-                        statusBit: doc.statusBit
+                        statusBit: doc.statusBit,
+                        updatedAt: doc.updatedAt
                     });
                 });
                 let couponResponce = userRecord;
@@ -195,7 +198,7 @@ async add(req, res) {
 
         const existingUser = await UserModel.findOne({ email: req.body.email });
         if (existingUser) {
-            let result = makeApiResponce('Email is Already Exsit', 1, BAD_REQUEST)
+            let result = makeApiResponce('Email is already exist', 1, BAD_REQUEST)
             return res.status(BAD_REQUEST).json(result);
         }
         const user = new UserModel();

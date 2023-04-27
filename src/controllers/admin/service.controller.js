@@ -16,7 +16,7 @@ import { makeApiResponce } from '../../libraries/responce';
                         serviceRecord.push({
                              id: doc._id,
                              name: doc.name,
-                             image :url + "/src/uploads/images/couponImage/"+doc.image
+                             image : doc.image
                          });
                      });
                      let serviceResponce = serviceRecord;
@@ -101,7 +101,7 @@ import { makeApiResponce } from '../../libraries/responce';
              let serviceResponce = {
                  id: findService._id,
                  name: findService.name,
-                 image :url + "/src/uploads/images/couponImage/"+findService.image
+                 image : findService.image
              }
              let result = makeApiResponce('Service Detail', 1, OK, serviceResponce);
              return res.json(result);

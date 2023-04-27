@@ -1,11 +1,16 @@
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK } from "http-status-codes";
 import StaffModel from "../../models/staff.model";
 import { makeApiResponce } from '../../libraries/responce';
+import UserModel from "../../models/user.model";
+import AssignedOrderModel from "../../models/assignedOrder.model";
+import ActivityLogModel from "../../models/activityLog.model";
 
  export default {
     async listing(req, res){
         try{
             
+            // const userQuery = { company: req.params.id, accountType : 'standard_contractor' };
+            //  const getStaff = await UserModel.find(userQuery,{ _id: 1, firstName: 1, lastName: 1 });
             let getStaff =  await StaffModel.find({company:req.params.id});
             if(!getStaff){
                 let result = makeApiResponce('Empty list coupon', 1, BAD_REQUEST)
@@ -137,5 +142,117 @@ import { makeApiResponce } from '../../libraries/responce';
                  return res.status(INTERNAL_SERVER_ERROR).json(result)
              }
      },
+
+     async assignStaff(req, res){
+        try{
+            
+            const userQuery = { order: req.params.id,};
+            const getAssign = await AssignedOrderModel.find(userQuery).populate('userTo', {'firstName': 1, 'lastName': 1, '_id': 1});
+            // let getStaff =  await StaffModel.find({company:req.params.id});
+            if(!getAssign){
+                let result = makeApiResponce('Empty list', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Listing', 1, OK, getAssign);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+    async deleteAssignStaff(req, res) {
+         try {
+             // const findStaff = await AssignedOrderModel.findById(req.params.id);
+             // if (!findStaff) {
+             //     let result = makeApiResponce('Not found.', 1, BAD_REQUEST)
+             //     return res.status(BAD_REQUEST).json(result);
+             // }
+
+             const deleteAssStaff = await AssignedOrderModel.deleteOne({ _id: req.params.id });
+             if (!deleteAssStaff) {
+                 let result = makeApiResponce('Network Error please try again.', 1, BAD_REQUEST)
+                 return res.status(BAD_REQUEST).json(result);
+             }
+
+             let userResponce = {};
+             let result = makeApiResponce('Successfully', 1, OK, userResponce);
+             return res.json(result);
+
+         }catch(err){
+             console.log(err);
+             let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+             return res.status(INTERNAL_SERVER_ERROR).json(result)
+         }
+     },
+
+
+     async listofAssignStaff(req, res){
+        try{
+            
+            const userQuery = { company: req.params.id, accountType : 'standard_contractor' };
+             const getStaff = await UserModel.find(userQuery,{ _id: 1, firstName: 1, lastName: 1 });
+            // let getStaff =  await StaffModel.find({company:req.params.id});
+            if(!getStaff){
+                let result = makeApiResponce('Empty list coupon', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Coupon Listing', 1, OK, getStaff);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+    async listofActivityLog(req, res){
+        try{
+            
+            let getActivityLog =  await ActivityLogModel.find({order:req.params.id}).populate('user');
+            if(!getActivityLog){
+                let result = makeApiResponce('Empty list coupon', 1, BAD_REQUEST)
+                return res.status(BAD_REQUEST).json(result);
+            }
+            let result = makeApiResponce('Successfully', 1, OK, getActivityLog);
+            return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
+
+
+    async addActivityLog(req, res) {
+        try {
+
+                const activityLog = new ActivityLogModel();
+                activityLog.title = req.body.title;
+                activityLog.message = req.body.message;
+                activityLog.type = req.body.type;
+                activityLog.order = req.body.order;
+                activityLog.user = req.body.user;
+                // console.log(activityLog);
+                // return false;
+                activityLog.save();
+                let responce = {
+                    id: activityLog._id 
+                }
+
+                let result = makeApiResponce('Successfully', 1, OK, responce);
+                return res.json(result);
+
+        }catch(err){
+            console.log(err);
+            let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+            return res.status(INTERNAL_SERVER_ERROR).json(result)
+        }
+    },
 
 };
