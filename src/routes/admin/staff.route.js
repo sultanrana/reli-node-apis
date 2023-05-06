@@ -12,6 +12,7 @@ staffRouter.get('/detail/:id', passport.authenticate('jwt', { session: false, fa
 staffRouter.delete('/delete/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.delete);
 staffRouter.get('/assignStaff/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.assignStaff);
 staffRouter.delete('/deleteAssignStaff/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.deleteAssignStaff);
-staffRouter.get('/listofAssignStaff/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.listofAssignStaff);
+// staffRouter.get('/listofAssignStaff/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.listofAssignStaff);
 staffRouter.get('/listofActivityLog/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.listofActivityLog);
 staffRouter.post('/addActivityLog', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.addActivityLog);
+staffRouter.get('/listofAssignStaff', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), staffController.listofAssignStaff);

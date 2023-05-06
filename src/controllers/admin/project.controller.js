@@ -112,7 +112,8 @@ export default {
         try {
             if (mongoose.isValidObjectId(req.body.userTo) && mongoose.isValidObjectId(req.body.order)) {
 
-                const isProjectAlreadyAssigned = await AssignedOrderModel.findOne({order:req.body.order, delBit: false})
+                // const isProjectAlreadyAssigned = await AssignedOrderModel.findOne({order:req.body.order, delBit: false})
+                const isProjectAlreadyAssigned = await AssignedOrderModel.findOne({userTo:req.body.userTo, delBit: false})
                 if (!isProjectAlreadyAssigned) {
                     const assignedOrderModel = new AssignedOrderModel();
                     assignedOrderModel.order = req.body.order;

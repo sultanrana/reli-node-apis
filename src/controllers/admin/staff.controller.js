@@ -192,7 +192,8 @@ import ActivityLogModel from "../../models/activityLog.model";
      async listofAssignStaff(req, res){
         try{
             
-            const userQuery = { company: req.params.id, accountType : 'standard_contractor' };
+            // const userQuery = { company: req.params.id, accountType : 'standard_contractor' };
+            const userQuery = { accountType : 'standard_contractor' };
              const getStaff = await UserModel.find(userQuery,{ _id: 1, firstName: 1, lastName: 1 });
             // let getStaff =  await StaffModel.find({company:req.params.id});
             if(!getStaff){

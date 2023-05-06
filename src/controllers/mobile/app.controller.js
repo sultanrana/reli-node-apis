@@ -2161,7 +2161,8 @@ export default {
             // }
 
             findOrder.orderStatus = req.body.orderStatus;
-            findOrder.orderStatusDate = Date.now();
+            // findOrder.orderStatusDate = Date.now();
+            findOrder.orderStatusDate = req.body.orderStatusDate;
             await findOrder.save();
 
             let activityLogTitle = '';
