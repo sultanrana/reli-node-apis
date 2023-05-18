@@ -86,8 +86,5 @@ const interiorDoorStyleSchema = new Schema({
   },
 });
 
-// const InteriorDoorStyle = mongoose.model("InteriorDoorStyle", interiorDoorStyleSchema);
-
-// module.exports = InteriorDoorStyle;
 
 export default mongoose.model("InteriorDoorStyle", interiorDoorStyleSchema);

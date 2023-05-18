@@ -64,3 +64,7 @@ appRouter.put('/updateUserStatusBit/:id', passport.authenticate('jwt', { session
 
 appRouter.put('/updateStaff/:id',upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.updateStaff);
 appRouter.get('/listofTransactions', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listofTransactions);
+
+
+appRouter.get('/calculate-door-price', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.getDoorPrice);
+appRouter.get('/getInteriorDoorVariations',  passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.getInteriorDoorVariations);
