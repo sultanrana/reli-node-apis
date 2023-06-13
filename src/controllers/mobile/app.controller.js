@@ -787,7 +787,7 @@ export default {
     try {
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
-        customer: 'cus_NYx4uRfkFcEuhm',
+        customer: req.currentUser.stripeCustomerId,
         amount: req.body.totalAmount * 100,
         currency: "usd",
         source: stripeCardId,
@@ -1212,7 +1212,7 @@ export default {
           $sort: { createdAt: -1 },
         },
       ]);
-
+      console.log(orderDetail);
       if (!orderDetail) {
         let result = makeApiResponce("Empty Order Detail", 1, BAD_REQUEST);
         return res.status(BAD_REQUEST).json(result);
@@ -2781,6 +2781,7 @@ async function saveOrderDetail(data, service, files, newOrderModel_id) {
 
 async function saveWindowOrder(data, files, newOrderModel_id) {
   for (var i = 0; i < data.length; i++) {
+    console.log(data)
     let arr = getFileNameArrByItem(files, i);
 
     let newOrderDetailModel = new OrderDetailModel();
