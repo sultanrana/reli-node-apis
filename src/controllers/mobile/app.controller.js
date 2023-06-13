@@ -787,7 +787,7 @@ export default {
     try {
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
-        customer: 'cus_NYx4uRfkFcEuhm',
+        customer: req.currentUser.stripeCustomerId,
         amount: req.body.totalAmount * 100,
         currency: "usd",
         source: stripeCardId,
