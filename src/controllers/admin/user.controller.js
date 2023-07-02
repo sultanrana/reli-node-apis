@@ -148,6 +148,37 @@ async verifyOTP(req, res){
     }
 },
 
+async approve(req, res) {
+    try{
+        // FETCH THE USER
+        if(!req.body.email ){
+            let result = makeApiResponce('Email Required', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+        const userQuery = { email: req.body.email };
+        let user =  await UserModel.findOne(userQuery);
+        if(!user){
+            let result = makeApiResponce('Invalid Email', 1, BAD_REQUEST)
+            return res.status(BAD_REQUEST).json(result);
+        }
+
+        user.isApproved = true;
+        await user.save();
+
+        let userResponce;
+            userResponce = {
+                userData : user
+            }
+        let result = makeApiResponce('Account Approved Successfully', 1, OK, userResponce);
+        return res.json(result);
+
+    }catch(err){
+        console.log(err);
+        let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
+        return res.status(INTERNAL_SERVER_ERROR).json(result)
+    }
+}
+
 
 /////////// user crud /////////////////
 

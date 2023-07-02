@@ -123,6 +123,14 @@ export default {
         );
         return res.status(BAD_REQUEST).json(result);
       }
+      if (!user.isApproved) {
+        let result = makeApiResponce(
+          "Account no approved yet. Please ask admin for more details.",
+          1,
+          FORBIDDEN
+        );
+        return res.status(FORBIDDEN).json(result);
+      }
       const matched = await bcryptjs.compare(req.body.password, user.password);
       if (!matched) {
         let result = makeApiResponce("invalid Credential", 1, BAD_REQUEST);
