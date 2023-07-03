@@ -177,7 +177,7 @@ async approve(req, res) {
         let result = makeApiResponce('INTERNAL_SERVER_ERROR', 0, INTERNAL_SERVER_ERROR);
         return res.status(INTERNAL_SERVER_ERROR).json(result)
     }
-}
+},
 
 
 /////////// user crud /////////////////
