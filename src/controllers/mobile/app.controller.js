@@ -4,6 +4,7 @@ import {
   UNAUTHORIZED,
   OK,
   NOT_FOUND,
+  FORBIDDEN
 } from "http-status-codes";
 import bcryptjs from "bcryptjs";
 import userService from "../../services/user.service.js";
@@ -125,7 +126,7 @@ export default {
       }
       if (!user.isApproved) {
         let result = makeApiResponce(
-          "Account no approved yet. Please ask admin for more details.",
+          "Account not approved yet. Please ask admin for more details.",
           1,
           FORBIDDEN
         );
