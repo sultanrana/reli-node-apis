@@ -124,7 +124,7 @@ export default {
         );
         return res.status(BAD_REQUEST).json(result);
       }
-      if (!user.isApproved) {
+      if (!user.isApproved && user.userType === 'contractor') {
         let result = makeApiResponce(
           "Account not approved yet. Please ask admin for more details.",
           1,
