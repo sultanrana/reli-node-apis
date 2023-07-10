@@ -2766,6 +2766,84 @@ export default {
       return res.status(INTERNAL_SERVER_ERROR).json(result);
     }
   },
+  /**
+   * Contractor will be created along with the company.
+   * @param req
+   * @param res
+   */
+  async createContractor(req, res) {
+    try {
+      let image='';
+      if (req.files && req.files[0]!== undefined) {
+          image = req.files[0].filename;
+      }
+
+      const existingCompany = await CompanyModel.findOne({ representativeEmail: req.body.email });
+      const existingUser = await StaffModel.findOne({ email: req.body.email });
+      const existingStaff = await StaffModel.findOne({ email: req.body.email });
+      if (existingCompany || existingUser || existingStaff) {
+          let result = makeApiResponce('Email is Already Exsit', 1, BAD_REQUEST)
+          return res.status(BAD_REQUEST).json(result);
+      }
+
+      const company = new CompanyModel();
+      company.companyName = req.body.companyName;
+      company.addressOne = req.body.addressOne;
+      company.addressTwo = req.body.addressTwo;
+      company.companyStatus = 'enable';
+      company.distanceWillingTravel = req.body.distanceWillingTravel;
+      company.representativeName = `${req.body.firstName} ${req.body.lastName}`;
+      company.representativeNumber = req.body.number;
+      company.representativeEmail = req.body.email;
+      company.services = req.body.services;
+      company.image = image;
+
+      const user = new UserModel();
+      user.email = req.body.email;
+      user.firstName = req.body.firstName;
+      user.lastName = req.body.lastName;
+      user.userType = 'contractor';
+      const hash = await getEncryptedPassword(req.body.password);
+      user.password = hash;
+
+      await Promise.all([company.save(), user.save()])
+ 
+      const staffModel = new StaffModel();
+      staffModel.company = company._id;
+      staffModel.userId = user._id;
+      staffModel.name = `${req.body.firstName} ${req.body.lastName}`;
+      staffModel.email = req.body.email;
+      staffModel.phone = req.body.number;
+      staffModel.approvedByReli = 'active';
+      staffModel.accountType = 'true';
+      staffModel.status = true;
+      staffModel.image = image;
+      await staffModel.save();
+      const html = `
+                <p>${req.body.firstName},</p><p>Welcome to Reli, the easiest system for home repairs!</p><p>Reli is a company dedicated to making home repairs simple.</p>`;
+      const mailResponceNewUser = await sendEmail({
+        html,
+        subject: `Welcome to the Reli System`,
+        email: req.body.email,
+      });
+      let responce = {
+          staff: staffModel._id,
+          company: company._id,
+          user: user._id
+      }
+
+      let result = makeApiResponce('Successfully', 1, OK, responce);
+      return res.json(result);
+    } catch (error) {
+      console.log("🚀 ~ file: app.controller.js:2830 ~ createContractor ~ error:", error)
+      let result = makeApiResponce(
+        "INTERNAL_SERVER_ERROR",
+        0,
+        INTERNAL_SERVER_ERROR
+      );
+      return res.status(INTERNAL_SERVER_ERROR).json(result);
+    }
+  }
 };
 
 function getFileNameArrByItem(fiels, num) {

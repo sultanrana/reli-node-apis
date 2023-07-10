@@ -12,6 +12,10 @@ const StaffSchema = new Schema({
       ref: 'Company',
       required: true
     },
+    userId: {
+      type: String,
+      default: null
+    },
     email: {
       type: String,
       default: null,

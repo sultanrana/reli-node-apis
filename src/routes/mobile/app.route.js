@@ -7,6 +7,7 @@ export const appRouter =  express.Router();
 
 appRouter.post('/login', appController.login);
 appRouter.post('/signup', appController.signup);
+appRouter.post('/signupContractor', appController.createContractor);
 appRouter.post('/checkEmail', appController.checkEmail);
 appRouter.post('/verifyOTP', appController.verifyOTP);
 appRouter.post('/resendVerifyOTP', appController.resendVerifyOTP);
