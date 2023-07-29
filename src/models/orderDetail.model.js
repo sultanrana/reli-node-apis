@@ -17,6 +17,10 @@ const OrderDetail = new Schema(
       type: String,
       default: null,
     },
+    label: {
+      type: String,
+      required: false,
+    },
     serviceType: {
       type: String,
       default: null,
@@ -26,9 +30,29 @@ const OrderDetail = new Schema(
       ref: "Property",
       required: true,
     },
+    handling: {
+      type: String,
+      required: false,
+    },
     roomType: {
       type: String,
       default: null,
+    },
+    grid: {
+      type: String,
+      required: false,
+    },
+    doorType: {
+      type: String,
+      required: false,
+    },
+    doorSize: {
+      type: String,
+      required: false,
+    },
+    lockAndKey: {
+      type: String,
+      required: false
     },
     distanceFromGround: {
       type: String,
@@ -37,6 +61,14 @@ const OrderDetail = new Schema(
     floorType: {
       type: String,
       default: null,
+    },
+    sTiles: {
+      type: String,
+      required: false
+    },
+    sticking: {
+      type: String,
+      required: false
     },
     measureType: {
       type: String,
@@ -67,6 +99,46 @@ const OrderDetail = new Schema(
     glassType: {
       type: String,
       default: null,
+    },
+    borePrep: {
+      type: String,
+      required: false
+    },
+    bevel: {
+      type: String,
+      required: false
+    },
+    interiorHardware: {
+      type: String,
+      required: false
+    },
+    preHanging: {
+      type: String,
+      required: false
+    },
+    wallCondition: {
+      type: String,
+      required: false
+    },
+    carpetCut: {
+      type: String,
+      required: false
+    },
+    stopType: {
+      type: String,
+      required: false
+    },
+    bullNose: {
+      type: String,
+      required: false
+    },
+    astragal: {
+      type: String,
+      required: false
+    },
+    flushBolts: {
+      type: String,
+      required: false
     },
     designType: {
       type: String,
@@ -131,6 +203,22 @@ const OrderDetail = new Schema(
     hinges: {
         type: String,
         default: null
+    },
+    hingeType: {
+      type: String,
+      required: false
+    },
+    hingeFinish: {
+      type: String,
+      required: false
+    },
+    ballBearingHinges: {
+      type: String,
+      required: false
+    },
+    hingeType: {
+      type: String,
+      required: false
     },
     isFireRated: {
         type: Boolean,

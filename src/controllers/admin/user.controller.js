@@ -109,7 +109,7 @@ async forgotPassword(req, res) {
             });
         
         let userResponce = {};
-        let result = makeApiResponce('Password Update Successfully', 1, OK, userResponce);
+        let result = makeApiResponce('Check your email for instructions on resetting your password', 1, OK, userResponce);
         return res.json(result);
 
     }catch(err){
@@ -229,7 +229,7 @@ async add(req, res) {
 
         const existingUser = await UserModel.findOne({ email: req.body.email });
         if (existingUser) {
-            let result = makeApiResponce('Email is already exist', 1, BAD_REQUEST)
+            let result = makeApiResponce('Email already exists', 1, BAD_REQUEST)
             return res.status(BAD_REQUEST).json(result);
         }
         const user = new UserModel();

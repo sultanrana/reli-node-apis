@@ -16,6 +16,38 @@ const interiorDoorStyleSchema = new Schema({
     type: String,
     required: true,
   },
+  room: {
+    type: String,
+    required: false,
+  },
+  floor: {
+    type: String,
+    required: false,
+  },
+  grid: {
+    type: String,
+    required: false,
+  },
+  doorType: {
+    type: String,
+    required: false,
+  },
+  openDirection: {
+    type: String,
+    required: false,
+  },
+  size: {
+    type: String,
+    required: false,
+  },
+  color: {
+    type: String,
+    required: false,
+  },
+  lockAndKey: {
+    type: String,
+    required: false
+  },
   wallConditionJambWidth: {
     type: String,
     required: true,
@@ -75,7 +107,7 @@ const interiorDoorStyleSchema = new Schema({
   hinges: {
     type: Number,
     required: true,
-  },
+  },  
   isFireRated: {
     type: Boolean,
     required: true,

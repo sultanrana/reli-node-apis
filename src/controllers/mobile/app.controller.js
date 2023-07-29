@@ -2878,6 +2878,10 @@ async function saveWindowOrder(data, files, newOrderModel_id) {
     newOrderDetailModel.serviceType = data[i].serviceType;
     newOrderDetailModel.property = data[i].propertyId;
     newOrderDetailModel.roomType = data[i].roomType;
+    newOrderDetailModel.grid = data[i].grid;
+    newOrderDetailModel.doorType = data[i].doorType;
+    newOrderDetailModel.doorSize = data[i].doorSize;
+    newOrderDetailModel.lockAndKey = data[i].lockAndKey;
     newOrderDetailModel.distanceFromGround = data[i].distanceFromGround;
     newOrderDetailModel.floorType = data[i].floorType;
     newOrderDetailModel.measureType = data[i].measureType;
@@ -2906,8 +2910,22 @@ async function saveInteriorDoorOrderDetail(data, files, newOrderModel_id) {
     newOrderDetailModel.order = newOrderModel_id;
     newOrderDetailModel.service = data[i].serviceId;
     newOrderDetailModel.serviceName = data[i].serviceName;
+    newOrderDetailModel.label = data[i].label;
     newOrderDetailModel.serviceType = data[i].serviceType;
     newOrderDetailModel.property = data[i].propertyId;
+    newOrderDetailModel.handling = data[i].handling;
+    newOrderDetailModel.sTiles = data[i].sTiles;
+    newOrderDetailModel.sticking = data[i].sticking;
+    newOrderDetailModel.borePrep = data[i].borePrep;
+    newOrderDetailModel.bevel = data[i].bevel;
+    newOrderDetailModel.interiorHardware = data[i].interiorHardware;
+    newOrderDetailModel.preHanging = data[i].preHanging;
+    newOrderDetailModel.wallCondition = data[i].wallCondition;
+    newOrderDetailModel.carpetCut = data[i].carpetCut;
+    newOrderDetailModel.stopType = data[i].stopType;
+    newOrderDetailModel.bullNose = data[i].bullNose;
+    newOrderDetailModel.astragal = data[i].astragal;
+    newOrderDetailModel.flushBolts = data[i].flushBolts;
     newOrderDetailModel.width = data[i].width;
     newOrderDetailModel.height = data[i].height;
     newOrderDetailModel.images = arr;
@@ -2920,6 +2938,10 @@ async function saveInteriorDoorOrderDetail(data, files, newOrderModel_id) {
     newOrderDetailModel.coreType = data[i].coreType;
     newOrderDetailModel.doorThicknessInches = data[i].doorThicknessInches;
     newOrderDetailModel.hinges = data[i].hinges;
+    newOrderDetailModel.hingeType = data[i].hingeType;
+    newOrderDetailModel.hingeFinish = data[i].hingeFinish;
+    newOrderDetailModel.ballBearingHinges = data[i].ballBearingHinges;
+    newOrderDetailModel.hingeType = data[i].hingeType;
     newOrderDetailModel.isFireRated = data[i].isFireRated;
   
     await newOrderDetailModel.save(function (err) {});
