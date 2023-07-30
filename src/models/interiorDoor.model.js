@@ -12,6 +12,10 @@ const interiorDoorStyleSchema = new Schema({
     ref: "Service",
     required: true,
   },
+  image: {
+    type: String,
+    required: false
+  },
   modelName: {
     type: String,
     required: true,
