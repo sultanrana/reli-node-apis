@@ -216,10 +216,6 @@ const OrderDetail = new Schema(
       type: String,
       required: false
     },
-    hingeType: {
-      type: String,
-      required: false
-    },
     isFireRated: {
         type: Boolean,
         default: null

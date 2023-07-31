@@ -30,7 +30,9 @@ appRouter.get('/detail/:id', passport.authenticate('jwt', { session: false, fail
 appRouter.delete('/delete/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.delete);
 
 //Customer Side Apis
-appRouter.post('/placeOrder', upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.placeOrder);
+appRouter.post('/placeWindowOrder', upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.placeWindowOrder);
+appRouter.post('/placeInteriorOrder', upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.placeInteriorOrder);
+appRouter.post('/placeSlidingOrder', upload.any(), passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.placeSlidingOrder);
 appRouter.get('/dashboard', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.dashboard);
 appRouter.get('/listOfProjects', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.listOfProjects);
 appRouter.get('/orderDetail/:id', passport.authenticate('jwt', { session: false, failureRedirect: '/failure' }), appController.orderDetail);

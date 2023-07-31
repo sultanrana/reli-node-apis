@@ -789,7 +789,261 @@ export default {
     }
   },
 
-  async placeOrder(req, res) {
+  async placeWindowOrder(req, res) {
+    let data = req.body.arrayData;
+    let stripeCardId = req.body.stripeCardId;
+
+    try {
+      console.log("making a stripe charge");
+      const stripeCharge = await stripe.charges.create({
+        customer: req.currentUser.stripeCustomerId,
+        amount: req.body.totalAmount * 100,
+        currency: "usd",
+        source: stripeCardId,
+        description: "My First Test Charge",
+      });
+      console.log("stripe success");
+      console.log("storing order info OrderModel");
+
+      var newOrderModel = new OrderModel();
+      newOrderModel.user = req.currentUser;
+      newOrderModel.name = req.body.name;
+      newOrderModel.email = req.body.email;
+      newOrderModel.cardHolderName = req.body.cardHolderName;
+
+      newOrderModel.cardBrand = stripeCharge.source.cardBrand;
+      newOrderModel.cardlast4 = stripeCharge.source.last4;
+      newOrderModel.cardExpMonth = stripeCharge.source.exp_month;
+      newOrderModel.cardExpYear = stripeCharge.source.exp_year;
+      newOrderModel.cardCvc = stripeCharge.source.cvc;
+
+      (newOrderModel.stripePaymentId = stripeCharge.id),
+        (newOrderModel.subTotalAmount = req.body.subTotalAmount);
+      newOrderModel.discountAmount = req.body.discountAmount;
+      newOrderModel.totalAmount = req.body.totalAmount;
+      let dateArr = req.body.dateSelection.split(",");
+      newOrderModel.dateSelection = dateArr;
+      newOrderModel.save(function (err) {});
+      console.log("storing details");
+      await saveOrderDetail(data, req.body.service, req.files, newOrderModel._id);
+
+      let orderResponce = {
+        id: newOrderModel._id,
+      };
+
+      const activityLogModelData = new ActivityLogModel();
+      activityLogModelData.title = "Project Created";
+      activityLogModelData.message = "Your project has been created";
+      activityLogModelData.type = "Project created";
+      activityLogModelData.order = newOrderModel._id;
+      activityLogModelData.user = req.currentUser._id;
+      activityLogModelData.save();
+
+      let result = makeApiResponce(
+        "property Created Successfully",
+        1,
+        OK,
+        orderResponce
+      );
+      return res.json(result);
+    } catch (err) {
+      console.log(`error===>${err}`)
+      let errorMessage;
+      switch (err.type) {
+        case "StripeCardError":
+          // A declined card error
+          err.message; // => e.g. "Your card's expiration year is invalid."
+          errorMessage =
+            "Your card's expiration year is invalid, " + err.message;
+          break;
+        case "StripeInvalidRequestError":
+          // Invalid parameters were supplied to Stripe's API
+          errorMessage =
+            "Invalid parameters were supplied to Stripe's API, " + err.message;
+          break;
+        case "StripeAPIError":
+          // An error occurred internally with Stripe's API
+          errorMessage =
+            "An error occurred internally with Stripe's API, " + err.message;
+          break;
+        case "StripeConnectionError":
+          // Some kind of error occurred during the HTTPS communication
+          errorMessage =
+            "Some kind of error occurred during the HTTPS communication, " +
+            err.message;
+          break;
+        case "StripeAuthenticationError":
+          // You probably used an incorrect API key
+          errorMessage =
+            "You probably used an incorrect API key, " + err.message;
+          break;
+        case "StripeRateLimitError":
+          // Too many requests hit the API too quickly
+          errorMessage =
+            "Too many requests hit the API too quickly, " + err.message;
+          break;
+        case "StripePermissionError":
+          // Access to a resource is not allowed
+          errorMessage = "Access to a resource is not allowed, " + err.message;
+          break;
+        case "StripeIdempotencyError":
+          // An idempotency key was used improperly
+          errorMessage =
+            "An idempotency key was used improperly, " + err.message;
+          break;
+        case "StripeInvalidGrantError":
+          // InvalidGrantError is raised when a specified code doesn't exist, is
+          // expired, has been used, or doesn't belong to you; a refresh token doesn't
+          // exist, or doesn't belong to you; or if an API key's mode (live or test)
+          // doesn't match the mode of a code or refresh token.
+          errorMessage =
+            " // InvalidGrantError is raised when a specified code doesn't exist, is\n" +
+            "                    // expired, has been used, or doesn't belong to you; a refresh token doesn't\n" +
+            "                    // exist, or doesn't belong to you; or if an API key's mode (live or test)\n" +
+            "                    // doesn't match the mode of a code or refresh token, " +
+            err.message;
+          break;
+        default:
+          let result = makeApiResponce(
+            "INTERNAL_SERVER_ERROR",
+            0,
+            INTERNAL_SERVER_ERROR
+          );
+          return res.status(INTERNAL_SERVER_ERROR).json(result);
+      }
+
+      let result1 = makeApiResponce(errorMessage, 1, BAD_REQUEST);
+      return res.status(BAD_REQUEST).json(result1);
+    }
+  },
+  async placeInteriorOrder(req, res) {
+    let data = req.body.arrayData;
+    let stripeCardId = req.body.stripeCardId;
+
+    try {
+      console.log("making a stripe charge");
+      const stripeCharge = await stripe.charges.create({
+        customer: req.currentUser.stripeCustomerId,
+        amount: req.body.totalAmount * 100,
+        currency: "usd",
+        source: stripeCardId,
+        description: "My First Test Charge",
+      });
+      console.log("stripe success");
+      console.log("storing order info OrderModel");
+
+      var newOrderModel = new OrderModel();
+      newOrderModel.user = req.currentUser;
+      newOrderModel.name = req.body.name;
+      newOrderModel.email = req.body.email;
+      newOrderModel.cardHolderName = req.body.cardHolderName;
+
+      newOrderModel.cardBrand = stripeCharge.source.cardBrand;
+      newOrderModel.cardlast4 = stripeCharge.source.last4;
+      newOrderModel.cardExpMonth = stripeCharge.source.exp_month;
+      newOrderModel.cardExpYear = stripeCharge.source.exp_year;
+      newOrderModel.cardCvc = stripeCharge.source.cvc;
+
+      (newOrderModel.stripePaymentId = stripeCharge.id),
+        (newOrderModel.subTotalAmount = req.body.subTotalAmount);
+      newOrderModel.discountAmount = req.body.discountAmount;
+      newOrderModel.totalAmount = req.body.totalAmount;
+      let dateArr = req.body.dateSelection.split(",");
+      newOrderModel.dateSelection = dateArr;
+      newOrderModel.save(function (err) {});
+      console.log("storing details");
+      await saveOrderDetail(data, req.body.service, req.files, newOrderModel._id);
+
+      let orderResponce = {
+        id: newOrderModel._id,
+      };
+
+      const activityLogModelData = new ActivityLogModel();
+      activityLogModelData.title = "Project Created";
+      activityLogModelData.message = "Your project has been created";
+      activityLogModelData.type = "Project created";
+      activityLogModelData.order = newOrderModel._id;
+      activityLogModelData.user = req.currentUser._id;
+      activityLogModelData.save();
+
+      let result = makeApiResponce(
+        "property Created Successfully",
+        1,
+        OK,
+        orderResponce
+      );
+      return res.json(result);
+    } catch (err) {
+      console.log(`error===>${err}`)
+      let errorMessage;
+      switch (err.type) {
+        case "StripeCardError":
+          // A declined card error
+          err.message; // => e.g. "Your card's expiration year is invalid."
+          errorMessage =
+            "Your card's expiration year is invalid, " + err.message;
+          break;
+        case "StripeInvalidRequestError":
+          // Invalid parameters were supplied to Stripe's API
+          errorMessage =
+            "Invalid parameters were supplied to Stripe's API, " + err.message;
+          break;
+        case "StripeAPIError":
+          // An error occurred internally with Stripe's API
+          errorMessage =
+            "An error occurred internally with Stripe's API, " + err.message;
+          break;
+        case "StripeConnectionError":
+          // Some kind of error occurred during the HTTPS communication
+          errorMessage =
+            "Some kind of error occurred during the HTTPS communication, " +
+            err.message;
+          break;
+        case "StripeAuthenticationError":
+          // You probably used an incorrect API key
+          errorMessage =
+            "You probably used an incorrect API key, " + err.message;
+          break;
+        case "StripeRateLimitError":
+          // Too many requests hit the API too quickly
+          errorMessage =
+            "Too many requests hit the API too quickly, " + err.message;
+          break;
+        case "StripePermissionError":
+          // Access to a resource is not allowed
+          errorMessage = "Access to a resource is not allowed, " + err.message;
+          break;
+        case "StripeIdempotencyError":
+          // An idempotency key was used improperly
+          errorMessage =
+            "An idempotency key was used improperly, " + err.message;
+          break;
+        case "StripeInvalidGrantError":
+          // InvalidGrantError is raised when a specified code doesn't exist, is
+          // expired, has been used, or doesn't belong to you; a refresh token doesn't
+          // exist, or doesn't belong to you; or if an API key's mode (live or test)
+          // doesn't match the mode of a code or refresh token.
+          errorMessage =
+            " // InvalidGrantError is raised when a specified code doesn't exist, is\n" +
+            "                    // expired, has been used, or doesn't belong to you; a refresh token doesn't\n" +
+            "                    // exist, or doesn't belong to you; or if an API key's mode (live or test)\n" +
+            "                    // doesn't match the mode of a code or refresh token, " +
+            err.message;
+          break;
+        default:
+          let result = makeApiResponce(
+            "INTERNAL_SERVER_ERROR",
+            0,
+            INTERNAL_SERVER_ERROR
+          );
+          return res.status(INTERNAL_SERVER_ERROR).json(result);
+      }
+
+      let result1 = makeApiResponce(errorMessage, 1, BAD_REQUEST);
+      return res.status(BAD_REQUEST).json(result1);
+    }
+  },
+  async placeSlidingOrder(req, res) {
     let data = req.body.arrayData;
     let stripeCardId = req.body.stripeCardId;
 
