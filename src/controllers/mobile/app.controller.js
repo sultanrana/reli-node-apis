@@ -3114,7 +3114,7 @@ async function saveOrderDetail(data, service, files, newOrderModel_id) {
   if (service.toLowerCase() === "window") {
     console.log("storing window");
     await saveWindowOrder(data, files, newOrderModel_id);
-  } else if (service.toLowerCase() == "interiordoor") {
+  } else {
     console.log("storing interior door");
     await saveInteriorDoorOrderDetail(data, files, newOrderModel_id);
   }
