@@ -10,6 +10,7 @@ import { customerRouter } from '../routes/admin/customer.route';
 import { projectRouter } from '../routes/admin/project.route';
 import { transactionRouter } from '../routes/admin/transaction.route';
 import { interiorDoorRouter } from '../routes/admin/interiorDoor.route';
+import { doorCasing } from '../routes/admin/doorCasing.route';
 
 export const adminRouter = express.Router();
 
@@ -23,6 +24,6 @@ adminRouter.use('/staff', staffRouter);
 adminRouter.use('/customers', customerRouter);
 adminRouter.use('/projects', projectRouter);
 adminRouter.use('/transactions', transactionRouter);
-adminRouter.use('/interior-door', interiorDoorRouter)
-adminRouter.use('/door-casing', interiorDoorRouter)
+adminRouter.use('/interior-door', interiorDoorRouter);
+adminRouter.use('/door-casing', doorCasing);
 

@@ -218,8 +218,99 @@ const OrderDetail = new Schema(
     },
     isFireRated: {
         type: Boolean,
-        default: null
-    }
+        default: null,
+        required: false
+    },
+      openInGarage: {
+          type: Boolean,
+          required: false,
+          default: null
+      },
+      fireRated: {
+          type: Boolean,
+          required: false,
+          default: null
+      },
+      core: {
+          type: String,
+          required: false,
+          default: null
+      },
+      doorHeight: {
+          type: String,
+          required: false,
+          default: null
+      },
+      doorWidth: {
+          type: String,
+          required: false,
+          default: null
+      },
+      jamb: {
+          type: String,
+          required: false,
+          default: null
+      },
+      doorStyle: {
+          type: String,
+          required: false,
+          default: null
+      },
+      doorFinish: {
+          type: String,
+          required: false,
+          default: null
+      },
+      doorOpening: {
+          type: String,
+          required: false,
+          default: null
+      },
+      doorHingColor: {
+          type: String,
+          required: false,
+          default: null
+      },
+      casing: {
+          type: String,
+          required: false,
+          default: null
+      },
+      useMyOwnTrim: {
+          type: Boolean,
+          required: false,
+          default: null
+      },
+      hardware: {
+          type: String,
+          required: false,
+          default: null
+      },
+      useMyOwnDoorHandle: {
+          type: Boolean,
+          required: false,
+          default: null
+      },
+      selectedRoomInfo: {
+          type: String,
+          required: false,
+          default: null
+      },
+      floor: {
+          type: String,
+          required: false,
+          default: null
+      },
+      gridSelection: {
+          type: String,
+          required: false,
+          default: null
+      },
+      color: {
+          type: String,
+          required: false,
+          default: null
+      },
   },
   { timestamps: true }
 );

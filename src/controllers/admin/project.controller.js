@@ -25,6 +25,7 @@ import StaffModel from "../../models/staff.model";
 import mongoose from "mongoose";
 import NotificationModel from "../../models/notification.model";
 import AssignedOrderModel from "../../models/assignedOrder.model";
+import customAlphabet from "nanoid"
 
 export default {
   /////////// project /////////////////
@@ -101,11 +102,14 @@ export default {
           delBit: false,
         });
         if (!isProjectAlreadyAssigned) {
+          const nanoid = customAlphabet('1234567890ABCD', 10)
+
           const assignedOrderModel = new AssignedOrderModel();
           assignedOrderModel.order = req.body.order;
           assignedOrderModel.userBy = req.currentUser._id;
           assignedOrderModel.userTo = req.body.userTo;
           assignedOrderModel.assignedDate = req.body.assignedDate;
+          assignedOrderModel.projectId = `PROJ ${nanoid(5)}`
           assignedOrderModel.save();
           let assignedOrderResponce = {
             id: assignedOrderModel._id,

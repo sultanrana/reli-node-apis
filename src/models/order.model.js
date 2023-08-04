@@ -99,7 +99,7 @@ const Order = new Schema({
     },
     requestStatus:{
         type: String,
-        required: true,
+        required: false,
         default: 'Pending'
     },
     dateSelection:[{

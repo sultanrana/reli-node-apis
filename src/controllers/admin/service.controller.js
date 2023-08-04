@@ -1,6 +1,7 @@
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, UNAUTHORIZED, OK } from "http-status-codes";
 import ServiceModel from "../../models/service.model";
 import { makeApiResponce } from '../../libraries/responce';
+import customAlphabet from "nanoid";
 
  export default {
      async listing(req, res) {
@@ -38,10 +39,11 @@ import { makeApiResponce } from '../../libraries/responce';
                         if (req.files[0]!== undefined) {
                             image = req.files[0].filename;
                         }
-                        
+            const nanoid = customAlphabet('1234567890ABCD', 10)
                         const serviceModel = new ServiceModel();
                         serviceModel.name = req.body.name;
                         serviceModel.image = image;
+                        serviceModel.serviceId = `ID ${nanoid(6)}`
                         serviceModel.save();
                         let serviceResponce = {
                             id: serviceModel._id 

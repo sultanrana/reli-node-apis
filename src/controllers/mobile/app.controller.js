@@ -817,7 +817,7 @@ export default {
       newOrderModel.cardExpYear = stripeCharge.source.exp_year;
       newOrderModel.cardCvc = stripeCharge.source.cvc;
 
-      (newOrderModel.stripePaymentId = stripeCharge.id),
+      (newOrderModel.stripePaymentId = stripeCharge.id);
         (newOrderModel.subTotalAmount = req.body.subTotalAmount);
       newOrderModel.discountAmount = req.body.discountAmount;
       newOrderModel.totalAmount = req.body.totalAmount;
@@ -3114,9 +3114,12 @@ async function saveOrderDetail(data, service, files, newOrderModel_id) {
   if (service.toLowerCase() === "window") {
     console.log("storing window");
     await saveWindowOrder(data, files, newOrderModel_id);
-  } else {
+  } else if (service.toLowerCase() === "interiordoor") {
     console.log("storing interior door");
     await saveInteriorDoorOrderDetail(data, files, newOrderModel_id);
+  } else if (service.toLowerCase() === "slidingdoor") {
+    console.log("sliding interior door");
+    await saveSlidingDoor(data, files, newOrderModel_id);
   }
 }
 
@@ -3151,8 +3154,26 @@ async function saveWindowOrder(data, files, newOrderModel_id) {
     newOrderDetailModel.openingType = data[i].openingType;
     newOrderDetailModel.openingDirection = data[i].openingDirection;
     newOrderDetailModel.totalAmount = data[i].totalAmount;
+    newOrderDetailModel.openInGarage = data[i].openInGarage;
+    newOrderDetailModel.fireRated = data[i].fireRated;
+    newOrderDetailModel.core = data[i].core;
+    newOrderDetailModel.doorHeight = data[i].doorHeight;
+    newOrderDetailModel.doorWidth = data[i].doorWidth;
+    newOrderDetailModel.jamb = data[i].jamb;
+    newOrderDetailModel.doorStyle = data[i].doorStyle;
+    newOrderDetailModel.doorFinish = data[i].doorFinish;
+    newOrderDetailModel.doorOpening = data[i].doorOpening;
+    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
+    newOrderDetailModel.casing = data[i].casing;
+    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
+    newOrderDetailModel.hardware = data[i].hardware;
+    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
+    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
+    newOrderDetailModel.floor = data[i].floor;
+    newOrderDetailModel.gridSelection = data[i].gridSelection;
+    newOrderDetailModel.color = data[i].color;
     await newOrderDetailModel.save(function (err) {});
-    console.log("stored window sucessfully");
+    console.log("stored window successfully");
   }
 }
 
@@ -3197,9 +3218,90 @@ async function saveInteriorDoorOrderDetail(data, files, newOrderModel_id) {
     newOrderDetailModel.ballBearingHinges = data[i].ballBearingHinges;
     newOrderDetailModel.hingeType = data[i].hingeType;
     newOrderDetailModel.isFireRated = data[i].isFireRated;
-  
+    newOrderDetailModel.openInGarage = data[i].openInGarage;
+    newOrderDetailModel.fireRated = data[i].fireRated;
+    newOrderDetailModel.core = data[i].core;
+    newOrderDetailModel.doorHeight = data[i].doorHeight;
+    newOrderDetailModel.doorWidth = data[i].doorWidth;
+    newOrderDetailModel.jamb = data[i].jamb;
+    newOrderDetailModel.doorStyle = data[i].doorStyle;
+    newOrderDetailModel.doorFinish = data[i].doorFinish;
+    newOrderDetailModel.doorOpening = data[i].doorOpening;
+    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
+    newOrderDetailModel.casing = data[i].casing;
+    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
+    newOrderDetailModel.hardware = data[i].hardware;
+    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
+    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
+    newOrderDetailModel.floor = data[i].floor;
+    newOrderDetailModel.gridSelection = data[i].gridSelection;
+    newOrderDetailModel.color = data[i].color;
     await newOrderDetailModel.save(function (err) {});
-    console.log("stored interior door sucessfully");
+    console.log("stored interior door successfully");
+
+  }
+}
+async function saveSlidingDoor(data, files, newOrderModel_id) {
+  for (let i = 0; i < data.length; i++) {
+    let arr = getFileNameArrByItem(files, i);
+
+    let newOrderDetailModel = new OrderDetailModel();
+    newOrderDetailModel.order = newOrderModel_id;
+    newOrderDetailModel.service = data[i].serviceId;
+    newOrderDetailModel.serviceName = data[i].serviceName;
+    newOrderDetailModel.label = data[i].label;
+    newOrderDetailModel.serviceType = data[i].serviceType;
+    newOrderDetailModel.property = data[i].propertyId;
+    newOrderDetailModel.handling = data[i].handling;
+    newOrderDetailModel.sTiles = data[i].sTiles;
+    newOrderDetailModel.sticking = data[i].sticking;
+    newOrderDetailModel.borePrep = data[i].borePrep;
+    newOrderDetailModel.bevel = data[i].bevel;
+    newOrderDetailModel.interiorHardware = data[i].interiorHardware;
+    newOrderDetailModel.preHanging = data[i].preHanging;
+    newOrderDetailModel.wallCondition = data[i].wallCondition;
+    newOrderDetailModel.carpetCut = data[i].carpetCut;
+    newOrderDetailModel.stopType = data[i].stopType;
+    newOrderDetailModel.bullNose = data[i].bullNose;
+    newOrderDetailModel.astragal = data[i].astragal;
+    newOrderDetailModel.flushBolts = data[i].flushBolts;
+    newOrderDetailModel.width = data[i].width;
+    newOrderDetailModel.height = data[i].height;
+    newOrderDetailModel.images = arr;
+    newOrderDetailModel.totalAmount = data[i].totalAmount;
+    newOrderDetailModel.modelName = data[i].modelName;
+    newOrderDetailModel.jambWidthInches = data[i].jambWidthInches;
+    newOrderDetailModel.unit = data[i].unit;
+    newOrderDetailModel.overallFrameHeight = data[i].overallFrameHeight;
+    newOrderDetailModel.overallFrameWidth = data[i].overallFrameWidth;
+    newOrderDetailModel.coreType = data[i].coreType;
+    newOrderDetailModel.doorThicknessInches = data[i].doorThicknessInches;
+    newOrderDetailModel.hinges = data[i].hinges;
+    newOrderDetailModel.hingeType = data[i].hingeType;
+    newOrderDetailModel.hingeFinish = data[i].hingeFinish;
+    newOrderDetailModel.ballBearingHinges = data[i].ballBearingHinges;
+    newOrderDetailModel.hingeType = data[i].hingeType;
+    newOrderDetailModel.isFireRated = data[i].isFireRated;
+    newOrderDetailModel.openInGarage = data[i].openInGarage;
+    newOrderDetailModel.fireRated = data[i].fireRated;
+    newOrderDetailModel.core = data[i].core;
+    newOrderDetailModel.doorHeight = data[i].doorHeight;
+    newOrderDetailModel.doorWidth = data[i].doorWidth;
+    newOrderDetailModel.jamb = data[i].jamb;
+    newOrderDetailModel.doorStyle = data[i].doorStyle;
+    newOrderDetailModel.doorFinish = data[i].doorFinish;
+    newOrderDetailModel.doorOpening = data[i].doorOpening;
+    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
+    newOrderDetailModel.casing = data[i].casing;
+    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
+    newOrderDetailModel.hardware = data[i].hardware;
+    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
+    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
+    newOrderDetailModel.floor = data[i].floor;
+    newOrderDetailModel.gridSelection = data[i].gridSelection;
+    newOrderDetailModel.color = data[i].color;
+    await newOrderDetailModel.save(function (err) {});
+    console.log("stored sliding door successfully");
 
   }
 }
