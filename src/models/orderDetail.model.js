@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 const OrderDetail = new Schema(
   {
     order: {
       type: Schema.Types.ObjectId,
-      ref: "Order",
+      ref: 'Order',
       required: true,
     },
     service: {
       type: Schema.Types.ObjectId,
-      ref: "Service",
+      ref: 'Service',
       required: true,
     },
     serviceName: {
@@ -27,7 +27,7 @@ const OrderDetail = new Schema(
     },
     property: {
       type: Schema.Types.ObjectId,
-      ref: "Property",
+      ref: 'Property',
       required: true,
     },
     handling: {
@@ -38,7 +38,7 @@ const OrderDetail = new Schema(
       type: String,
       default: null,
     },
-    grid: {
+    gridSelection: {
       type: String,
       required: false,
     },
@@ -52,7 +52,7 @@ const OrderDetail = new Schema(
     },
     lockAndKey: {
       type: String,
-      required: false
+      required: false,
     },
     distanceFromGround: {
       type: String,
@@ -64,11 +64,11 @@ const OrderDetail = new Schema(
     },
     sTiles: {
       type: String,
-      required: false
+      required: false,
     },
     sticking: {
       type: String,
-      required: false
+      required: false,
     },
     measureType: {
       type: String,
@@ -102,43 +102,43 @@ const OrderDetail = new Schema(
     },
     borePrep: {
       type: String,
-      required: false
+      required: false,
     },
     bevel: {
       type: String,
-      required: false
+      required: false,
     },
     interiorHardware: {
       type: String,
-      required: false
+      required: false,
     },
     preHanging: {
       type: String,
-      required: false
+      required: false,
     },
     wallCondition: {
       type: String,
-      required: false
+      required: false,
     },
     carpetCut: {
       type: String,
-      required: false
+      required: false,
     },
     stopType: {
       type: String,
-      required: false
+      required: false,
     },
     bullNose: {
       type: String,
-      required: false
+      required: false,
     },
     astragal: {
       type: String,
-      required: false
+      required: false,
     },
     flushBolts: {
       type: String,
-      required: false
+      required: false,
     },
     designType: {
       type: String,
@@ -173,146 +173,133 @@ const OrderDetail = new Schema(
       default: false,
     },
     modelName: {
-        type: String,
-        default: null,
+      type: String,
+      required: false,
+      default: null,
     },
-    jambWidthInches :{
-        type: String,
-        default: null
+    jambWidthInches: {
+      type: String,
+      required: false,
+      default: null,
     },
-    unit: {
-        type: String,
-        default: null,
+    units: {
+      type: String,
+      required: false,
+      default: null,
     },
     overallFrameWidth: {
-        type: String,
-        default: null
+      type: String,
+      required: false,
+      default: null,
     },
     overallFrameHeight: {
-        type: String,
-        default: null
+      type: String,
+      required: false,
+      default: null,
     },
     coreType: {
-        type: String,
-        default: null
+      type: String,
+      required: false,
+      default: null
     },
     doorThicknessInches: {
-        type: String,
-        default: null
+      type: String,
+      default: null,
+      required: false,
     },
     hinges: {
-        type: String,
-        default: null
+      type: String,
+      default: null,
+      required: false,
     },
     hingeType: {
       type: String,
-      required: false
+      required: false,
     },
     hingeFinish: {
       type: String,
-      required: false
+      required: false,
     },
     ballBearingHinges: {
       type: String,
-      required: false
+      required: false,
+    },
+    openInGarage: {
+      type: Boolean,
+      default: null,
     },
     isFireRated: {
-        type: Boolean,
-        default: null,
-        required: false
+      type: Boolean,
+      required: false,
+      default: null,
     },
-      openInGarage: {
-          type: Boolean,
-          required: false,
-          default: null
-      },
-      fireRated: {
-          type: Boolean,
-          required: false,
-          default: null
-      },
-      core: {
-          type: String,
-          required: false,
-          default: null
-      },
-      doorHeight: {
-          type: String,
-          required: false,
-          default: null
-      },
-      doorWidth: {
-          type: String,
-          required: false,
-          default: null
-      },
-      jamb: {
-          type: String,
-          required: false,
-          default: null
-      },
-      doorStyle: {
-          type: String,
-          required: false,
-          default: null
-      },
-      doorFinish: {
-          type: String,
-          required: false,
-          default: null
-      },
-      doorOpening: {
-          type: String,
-          required: false,
-          default: null
-      },
-      doorHingColor: {
-          type: String,
-          required: false,
-          default: null
-      },
-      casing: {
-          type: String,
-          required: false,
-          default: null
-      },
-      useMyOwnTrim: {
-          type: Boolean,
-          required: false,
-          default: null
-      },
-      hardware: {
-          type: String,
-          required: false,
-          default: null
-      },
-      useMyOwnDoorHandle: {
-          type: Boolean,
-          required: false,
-          default: null
-      },
-      selectedRoomInfo: {
-          type: String,
-          required: false,
-          default: null
-      },
-      floor: {
-          type: String,
-          required: false,
-          default: null
-      },
-      gridSelection: {
-          type: String,
-          required: false,
-          default: null
-      },
-      color: {
-          type: String,
-          required: false,
-          default: null
-      },
+    core: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorHeight: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorWidth: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    jamb: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorStyle: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorFinish: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorOpening: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorHingColor: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    casing: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    useMyOwnTrim: {
+      type: Boolean,
+      required: false,
+      default: null,
+    },
+    hardware: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    useMyOwnDoorHandle: {
+      type: Boolean,
+      required: false,
+      default: null,
+    },
+    selectedRoomInfo: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("OrderDetail", OrderDetail);
+export default mongoose.model('OrderDetail', OrderDetail);
