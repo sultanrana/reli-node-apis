@@ -5,12 +5,16 @@ import { configureDb } from './config/db.js';
 import { setGlobalmiddleware } from './middlewares/global-middleware';
 import path from 'path';
 import cors from 'cors';
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./middlewares/swagger.json";
+import bodyParser from "body-parser";
 
 configureDb();
 
 var app = express();
 
 app.use(cors({ origin: true }));
+app.use(bodyParser.json())
 
 
 app.use(express.static(path.join(__dirname, 'uploads/images')));
@@ -19,6 +23,11 @@ app.use(express.static(path.join(__dirname, 'uploads/images')));
 setGlobalmiddleware(app);
 
 app.use('/api', restRouter);
+
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
 
 // handler the the UNAUTORIZED 
 app.use('/failure', (req, res, next) => {

@@ -1,0 +1,1551 @@
+{
+  "swagger": "2.0",
+  "securityDefinitions": {
+    "jwtToken": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "jwtToken": []
+    }
+  ],
+  "info": {
+    "version": "1.0.0",
+    "title": "Reli API"
+  },
+  "paths": {
+    "/api/mobile/api/login": {
+      "post": {
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserLogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/signup": {
+      "post": {
+        "tags": ["Account"],
+        "description": "user sign up",
+        "parameters": [
+            {
+              "name": "Sign Up",
+              "in": "body",
+              "description": "User Information",
+              "schema": {
+                "$ref": "#/definitions/UserSignUp"
+              }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/getLoginUserProfile": {
+      "get": {
+        "tags": ["Account"],
+        "parameters": [
+
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/changePassword/{id}": {
+      "put": {
+        "description": "",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "change password",
+            "in": "body",
+            "description": "set your new password",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userNewPassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/updatePhoneNumber/{id}": {
+      "put": {
+        "description": "",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "change phone number",
+            "in": "body",
+            "description": "set your new phone number",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updatePhoneNumber"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mobile/api/updateAccountDetail/{id}": {
+      "put": {
+        "description": "update account details",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountDetail",
+            "in": "body",
+            "description": "set your new phone number",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/accountDetail"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api//mobile/api/updateLocation/{id}": {
+      "put": {
+        "description": "update location",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "accountDetail",
+            "in": "body",
+            "description": "set your new phone number",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updateLocation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/verifyOTP": {
+      "post": {
+        "description": "verify OTP",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "verify OTP",
+            "in": "body",
+            "description": "Verify OTP",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/verifyOTP"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/deleteAccount/{id}": {
+      "delete": {
+        "description": "Delete account",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/contactUs": {
+      "post": {
+        "description": "Contact us",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "contact us",
+            "in": "body",
+            "description": "contact us",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/contactUs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/forgotPassword": {
+      "post": {
+        "description": "Forgot password",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "contact us",
+            "in": "body",
+            "description": "contact us",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/forgotPassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/resendVerifyOTP": {
+      "post": {
+        "description": "Resend verify OTP",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "contact us",
+            "in": "body",
+            "description": "contact us",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/forgotPassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/getAllServices": {
+      "get": {
+        "description": "List of all services",
+        "tags": ["Services"],
+        "parameters": [
+
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/checkEmail": {
+      "post": {
+        "description": "check email",
+        "tags": ["Account"],
+        "parameters": [
+          {
+            "name": "check email",
+            "in": "body",
+            "description": "checkEmail",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/checkEmail"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfCompanies": {
+      "get": {
+        "description": "List of companies",
+        "tags": ["companies"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/placeWindowOrder": {
+      "post": {
+        "description": "Place window order",
+        "tags": ["Place Order"],
+        "parameters": [
+          {
+            "name": "place window order",
+            "in": "body",
+            "description": "place window order",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/placeWindowOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/placeInteriorOrder": {
+      "post": {
+        "description": "Place interior door order",
+        "tags": ["Place Order"],
+        "parameters": [
+          {
+            "name": "Place interior door order",
+            "in": "body",
+            "description": "Place interior door order",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/placeWindowOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/placeSlidingOrder": {
+      "post": {
+        "description": "Place Sliding door order",
+        "tags": ["Place Order"],
+        "parameters": [
+          {
+            "name": "Place Sliding door order",
+            "in": "body",
+            "description": "Place Sliding door order",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/placeWindowOrder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfNotifications": {
+      "get": {
+        "description": "Notification listing",
+        "tags": ["Notification"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/addNotification": {
+      "post": {
+        "description": "Add Notification",
+        "tags": ["Notification"],
+        "parameters": [
+          {
+            "name": "Add notification",
+            "in": "body",
+            "description": "add notification",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addNotification"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/notificationDetail/{id}": {
+      "get": {
+        "description": "Notification detail",
+        "tags": ["Notification"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfCustomerStripeCards": {
+      "get": {
+        "description": "List of customer stripe cards",
+        "tags": ["Stripe Customers"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/addCustomerStripeCard": {
+      "post": {
+        "description": "Add customer stripe card",
+        "tags": ["Stripe Customers"],
+        "parameters": [
+          {
+            "name": "Add customer stripe card",
+            "in": "body",
+            "description": "add customer stripe card",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/customerStripeCard"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/customerStripeCardDetail/{id}": {
+      "get": {
+        "description": "Customer stripe card detail",
+        "tags": ["Stripe Customers"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/delete/{id}": {
+      "get": {
+        "description": "Delete property",
+        "tags": ["Customer"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Delete property by ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listing": {
+      "get": {
+        "description": "List of all properties",
+        "tags": ["Customer"],
+        "parameters": [
+
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/detail/{id}": {
+      "get": {
+        "description": "Property detail",
+        "tags": ["Customer"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Property detail",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/update/{id}": {
+      "post": {
+        "description": "",
+        "tags": ["Customer"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "update property",
+            "in": "body",
+            "description": "update property",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updateProperty"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/add": {
+      "post": {
+        "description": "Add property",
+        "tags": ["Customer"],
+        "parameters": [
+          {
+            "name": "Add property",
+            "in": "body",
+            "description": "Add property",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addProperty"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/dashboard": {
+      "get": {
+        "description": "Customer Dashboard",
+        "tags": ["Customer"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfProjects": {
+      "get": {
+        "description": "List of projects",
+        "tags": ["Customer"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/orderDetail/{id}": {
+      "get": {
+        "description": "Order detail",
+        "tags": ["Customer"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/calculate-door-price": {
+      "get": {
+        "description": "Calculates the price of a door based on the provided parameters.",
+        "tags": ["Customer"],
+        "parameters": [
+          {
+            "name": "modelName",
+            "in": "query",
+            "description": "Model Name of door",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "jambWidthInches",
+            "in": "query",
+            "description": "Jamb Width of door",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "doorWidthInches",
+            "in": "query",
+            "description": "Door Width of door",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "unit",
+            "in": "query",
+            "description": "Unit",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "overallFrameWidth",
+            "in": "query",
+            "description": "Over all frame width",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "overallFrameHeight",
+            "in": "query",
+            "description": "Over all frame height",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "surface",
+            "in": "query",
+            "description": "surface",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "doorThicknessInches",
+            "in": "query",
+            "description": "Door thickness",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "coreType",
+            "in": "query",
+            "description": "Core type",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "hinges",
+            "in": "query",
+            "description": "Hinges",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "isFireRated",
+            "in": "query",
+            "description": "Is fire rated",
+            "required": true,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/contractorDashboard": {
+      "get": {
+        "description": "Contractor dashboard",
+        "tags": ["Contractor"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfActiveContractorProjects": {
+      "get": {
+        "description": "List of active contractor projects",
+        "tags": ["Contractor"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfAvailableContractorProjects": {
+      "get": {
+        "description": "List of available contractor projects",
+        "tags": ["Contractor"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/changeProjectRequestStatus/{id}": {
+      "post": {
+        "description": "Change project request status",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Change status",
+            "in": "body",
+            "description": "Change project request status",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/projectStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/changeProjectOrderStatus/{id}": {
+      "post": {
+        "description": "Change project order status",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Change status",
+            "in": "body",
+            "description": "Change project order status",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/projectOrderStatus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfStaff/{id}": {
+      "get": {
+        "description": "List of staff",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/assignProjectToUser": {
+      "get": {
+        "description": "Assign project to user",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "Assign project",
+            "in": "body",
+            "description": "Assign project to user",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/projectAssignment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfContractors": {
+      "get": {
+        "description": "List of contractors",
+        "tags": ["Contractor"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listOfScheduledContractorProjects": {
+      "get": {
+        "description": "List of scheduled contractor projects",
+        "tags": ["Contractor"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/getUserAllStatusBit/{id}": {
+      "get": {
+        "description": "Get all status Bit",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/updateUserStatusBit/": {
+      "put": {
+        "description": "Update user status bit",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "status bit",
+            "in": "body",
+            "description": "Update user status bit",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userStatusBit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/updateStaff/{id}": {
+      "put": {
+        "description": "Update staff",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Update staff",
+            "in": "body",
+            "description": "Update staff",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updateStaff"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/listofTransactions": {
+      "get": {
+        "description": "List of transactions",
+        "tags": ["Contractor"],
+        "parameters": [ ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/mobile/api/signupContractor": {
+      "post": {
+        "description": "Sign up contractor",
+        "tags": ["Contractor"],
+        "parameters": [
+          {
+            "name": "contractor signUp",
+            "in": "body",
+            "description": "Sign up contractor",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/contractorSignup"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "UserLogin": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "fcmToken": {
+          "type": "string"
+        }
+      }
+    },
+    "UserSignUp": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "appartment": {
+          "type": "string"
+        },
+        "willingRange": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "string"
+        },
+        "lng": {
+          "type": "string"
+        }
+      }
+    },
+    "userNewPassword": {
+      "type": "object",
+      "properties": {
+        "newPassword": {
+          "type": "string"
+        }
+      }
+    },
+    "updatePhoneNumber": {
+      "type": "object",
+      "properties": {
+        "phoneNumber": {
+          "type": "string"
+        }
+      }
+    },
+    "accountDetail": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        } ,
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "updateLocation": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "appartment": {
+          "type": "string"
+        },
+        "willingRange": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "integer"
+        },
+        "lng": {
+          "type": "integer"
+        }
+      }
+    },
+    "verifyOTP": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "otp": {
+          "type": "string"
+        }
+      }
+    },
+    "contactUs": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "forgotPassword": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "resendVerifyOtp": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "checkEmail": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "placeWindowOrder": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "cardHolderName": {
+          "type": "string"
+        },
+        "dateSelection": {
+          "type": "string"
+        },
+        "subTotalAmount": {
+          "type": "string"
+        },
+        "discountAmount": {
+          "type": "string"
+        },
+        "totalAmount": {
+          "type": "string"
+        },
+        "stripeCardId": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "arrayData": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "modelName": {
+                "type": "string"
+              },
+              "jambWidthInches": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "overallFrameHeight": {
+                "type": "string"
+              },
+              "overallFrameWidth": {
+                "type": "string"
+              },
+              "coreType": {
+                "type": "string"
+              },
+              "doorThicknessInches": {
+                "type": "string"
+              },
+              "hinges": {
+                "type": "string"
+              },
+              "isFireRated": {
+                "type": "boolean"
+              },
+              "openingType": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "height": {
+                "type": "string"
+              },
+              "serviceId": {
+                "type": "string"
+              },
+              "serviceName": {
+                "type": "string"
+              },
+              "serviceType": {
+                "type": "string"
+              },
+              "propertyId": {
+                "type": "string"
+              },
+              "stackedWindow": {
+                "type": "string"
+              },
+              "roomType": {
+                "type": "string"
+              },
+              "temperedGlassType": {
+                "type": "string"
+              },
+              "distanceFromGround": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              },
+              "floorType": {
+                "type": "string"
+              },
+              "openingDirection": {
+                "type": "string"
+              },
+              "glassType": {
+                "type": "string"
+              },
+              "gridSelection": {
+                "type": "string"
+              },
+              "doorHeight": {
+                "type": "string"
+              },
+              "doorWidth": {
+                "type": "string"
+              },
+              "lockAndKey": {
+                "type": "string"
+              },
+              "gridColor": {
+                "type": "string"
+              },
+              "casing": {
+                "type": "string"
+              },
+              "doorType": {
+                "type": "string"
+              },
+              "hardware": {
+                "type": "string"
+              },
+              "hingeType": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "addNotification": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "deviceToken": {
+          "type": "string"
+        }
+      }
+    },
+    "customerStripeCard": {
+      "type": "object",
+      "properties": {
+        "stripeCardHolderName": {
+          "type": "string"
+        },
+        "stripeCardToken": {
+          "type": "string"
+        }
+      }
+    },
+    "updateProperty": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "addressOne": {
+          "type": "string"
+        },
+        "addressTwo": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string"
+        },
+        "floors": {
+          "type": "string"
+        },
+        "basement": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        }
+      }
+    },
+    "addProperty": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "addressOne": {
+          "type": "string"
+        },
+        "addressTwo": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string"
+        },
+        "floors": {
+          "type": "string"
+        },
+        "basement": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        }
+      }
+    },
+    "projectStatus": {
+      "type": "object",
+      "properties": {
+        "requestStatus": {
+          "type": "string"
+        }
+      }
+    },
+    "projectOrderStatus": {
+      "type": "object",
+      "properties": {
+        "orderStatus": {
+          "type": "string"
+        }
+      }
+    },
+    "projectAssignment": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "string"
+        },
+        "userTo": {
+          "type": "string"
+        },
+        "assignedDate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "userStatusBit": {
+      "type": "object",
+      "properties": {
+        "newMessageFromCustomerNoti": {
+          "type": "boolean"
+        },
+        "newOrder": {
+          "type": "boolean"
+        },
+        "upcomingDelivery": {
+          "type": "boolean"
+        },
+        "newMessageFromCustomerEmail": {
+          "type": "boolean"
+        },
+        "projectUpdates": {
+          "type": "boolean"
+        },
+        "cancellation": {
+          "type": "boolean"
+        },
+        "rescheduleRequest": {
+          "type": "boolean"
+        },
+        "reminders": {
+          "type": "boolean"
+        }
+      }
+    },
+    "updateStaff": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phoneNumber": {
+          "type": "string"
+        },
+        "accountType": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string",
+          "format": "binary"
+        }
+      }
+    },
+    "contractorSignup": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "companyName": {
+          "type": "string"
+        },
+        "addressOne": {
+          "type": "string"
+        },
+        "addressTwo": {
+          "type": "string"
+        },
+        "distanceWillingTravel": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        },
+        "services": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

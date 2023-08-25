@@ -45,31 +45,31 @@ const Cart = new Schema({
       type: String,
       default: null,
     },
-    Tempered Glass: {
+    temperedGlass: {
       type: String,
       default: null,
     },
-    Glass Type: {
+    glassType: {
       type: String,
       default: null,
     },
-    Window Type: {
+    windowType: {
       type: String,
       default: null,
     },
-    Color Selection: {
+    colorSelection: {
       type: String,
       default: null,
     },
-    Window Style: {
+    windowStyle: {
       type: String,
       default: null,
     },
-    Window Opening: {
+    windowOpening: {
       type: String,
       default: null,
     },
-    Opening Direction: {
+    openingDirection: {
       type: String,
       default: null,
     },

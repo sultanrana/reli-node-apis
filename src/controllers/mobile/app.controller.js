@@ -31,6 +31,7 @@ import ActivityLogModel from "../../models/activityLog.model";
 import interiorDoorModel from "../../models/interiorDoor.model.js";
 
 import fcmNode from "fcm-node";
+import placeOrderService from "../../services/placeOrder.service";
 const FCM = require("../../libraries/notifications.js");
 
 // Setup Stripe
@@ -794,6 +795,16 @@ export default {
     let stripeCardId = req.body.stripeCardId;
 
     try {
+      for (var i = 0; i < data.length; i++){
+        const { error, value } = placeOrderService.validatePlaceOrderWindowSchema(
+            data[i]
+        );
+        if (error && error.details) {
+          let result = makeApiResponce(error.message, 0, BAD_REQUEST);
+          return res.status(BAD_REQUEST).json(result);
+        }
+      }
+
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
         customer: req.currentUser.stripeCustomerId,
@@ -921,6 +932,15 @@ export default {
     let stripeCardId = req.body.stripeCardId;
 
     try {
+      for (var i = 0; i < data.length; i++){
+        const { error, value } = placeOrderService.validatePlaceOrderInteriorDoorSchema(
+            data[i]
+        );
+        if (error && error.details) {
+          let result = makeApiResponce(error.message, 0, BAD_REQUEST);
+          return res.status(BAD_REQUEST).json(result);
+        }
+      }
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
         customer: req.currentUser.stripeCustomerId,
@@ -1048,6 +1068,15 @@ export default {
     let stripeCardId = req.body.stripeCardId;
 
     try {
+      for (var i = 0; i < data.length; i++){
+        const { error, value } = placeOrderService.validatePlaceOrderSlidingDoorSchema(
+            data[i]
+        );
+        if (error && error.details) {
+          let result = makeApiResponce(error.message, 0, BAD_REQUEST);
+          return res.status(BAD_REQUEST).json(result);
+        }
+      }
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
         customer: req.currentUser.stripeCustomerId,
@@ -3100,10 +3129,11 @@ export default {
   }
 };
 
-function getFileNameArrByItem(fiels, num) {
+function getFileNameArrByItem(files, num) {
   let arr = [];
-  fiels.forEach((file, index) => {
-    if (file.fieldname === "images" + num) {
+  if (!files) return arr;
+  files.forEach((file, index) => {
+    if (file.fieldname && file.fieldname === `images${num}`) {
       arr.push(file.filename);
     }
   });
@@ -3125,7 +3155,137 @@ async function saveOrderDetail(data, service, files, newOrderModel_id) {
 
 async function saveWindowOrder(data, files, newOrderModel_id) {
   for (var i = 0; i < data.length; i++) {
-    console.log(data)
+    let arr = getFileNameArrByItem(files, i);
+    let newOrderDetailModel = new OrderDetailModel();
+    newOrderDetailModel.order = newOrderModel_id;
+    newOrderDetailModel.service = data[i].serviceId;
+    newOrderDetailModel.serviceName = data[i].serviceName;
+    newOrderDetailModel.serviceType = data[i].serviceType;
+    newOrderDetailModel.property = data[i].propertyId;
+    newOrderDetailModel.roomType = data[i].roomType;
+    newOrderDetailModel.grid = data[i].grid;
+    newOrderDetailModel.doorType = data[i].doorType;
+    newOrderDetailModel.doorSize = data[i].doorSize;
+    newOrderDetailModel.lockAndKey = data[i].lockAndKey;
+    newOrderDetailModel.distanceFromGround = data[i].distanceFromGround;
+    newOrderDetailModel.floorType = data[i].floorType;
+    newOrderDetailModel.measureType = data[i].measureType;
+    newOrderDetailModel.width = data[i].width;
+    newOrderDetailModel.height = data[i].height;
+    newOrderDetailModel.currectMeasurement = data[i].currectMeasurement;
+    newOrderDetailModel.images = arr;
+    newOrderDetailModel.temperedGlassType = data[i].temperedGlassType;
+    newOrderDetailModel.glassType = data[i].glassType;
+    newOrderDetailModel.designType = data[i].designType;
+    newOrderDetailModel.colorSelection = data[i].colorSelection;
+    newOrderDetailModel.styleSelection = data[i].styleSelection;
+    newOrderDetailModel.openingType = data[i].openingType;
+    newOrderDetailModel.openingDirection = data[i].openingDirection;
+    newOrderDetailModel.totalAmount = data[i].totalAmount;
+    newOrderDetailModel.openInGarage = data[i].openInGarage;
+    newOrderDetailModel.fireRated = data[i].fireRated;
+    newOrderDetailModel.core = data[i].core;
+    newOrderDetailModel.doorHeight = data[i].doorHeight;
+    newOrderDetailModel.doorWidth = data[i].doorWidth;
+    newOrderDetailModel.jamb = data[i].jamb;
+    newOrderDetailModel.doorStyle = data[i].doorStyle;
+    newOrderDetailModel.doorFinish = data[i].doorFinish;
+    newOrderDetailModel.doorOpening = data[i].doorOpening;
+    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
+    newOrderDetailModel.casing = data[i].casing;
+    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
+    newOrderDetailModel.hardware = data[i].hardware;
+    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
+    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
+    newOrderDetailModel.floor = data[i].floor;
+    newOrderDetailModel.gridSelection = data[i].gridSelection;
+    newOrderDetailModel.color = data[i].color;
+    newOrderDetailModel.jambWidthInches = data[i].jambWidthInches;
+    newOrderDetailModel.modelName = data[i].modelName;
+    newOrderDetailModel.units = data[i].units;
+    newOrderDetailModel.unit = data[i].unit;
+    newOrderDetailModel.overallFrameWidth = data[i].overallFrameWidth;
+    newOrderDetailModel.overallFrameHeight = data[i].overallFrameHeight;
+    newOrderDetailModel.coreType = data[i].coreType;
+    newOrderDetailModel.doorThicknessInches = data[i].doorThicknessInches;
+    newOrderDetailModel.hinges = data[i].hinges;
+    newOrderDetailModel.isFireRated = data[i].isFireRated;
+    newOrderDetailModel.stackedWindow = data[i].stackedWindow;
+    newOrderDetailModel.doorCasing = data[i].doorCasing;
+    newOrderDetailModel.useMyOwnCasing = data[i].useMyOwnCasing;
+    await newOrderDetailModel.save();
+    console.log("stored window successfully");
+  }
+}
+
+async function saveInteriorDoorOrderDetail(data, files, newOrderModel_id) {
+  for (let i = 0; i < data.length; i++) {
+    let arr = getFileNameArrByItem(files, i);
+    let newOrderDetailModel = new OrderDetailModel();
+    newOrderDetailModel.order = newOrderModel_id;
+    newOrderDetailModel.service = data[i].serviceId;
+    newOrderDetailModel.serviceName = data[i].serviceName;
+    newOrderDetailModel.serviceType = data[i].serviceType;
+    newOrderDetailModel.property = data[i].propertyId;
+    newOrderDetailModel.roomType = data[i].roomType;
+    newOrderDetailModel.grid = data[i].grid;
+    newOrderDetailModel.doorType = data[i].doorType;
+    newOrderDetailModel.doorSize = data[i].doorSize;
+    newOrderDetailModel.lockAndKey = data[i].lockAndKey;
+    newOrderDetailModel.distanceFromGround = data[i].distanceFromGround;
+    newOrderDetailModel.floorType = data[i].floorType;
+    newOrderDetailModel.measureType = data[i].measureType;
+    newOrderDetailModel.width = data[i].width;
+    newOrderDetailModel.interiorHardware = data[i].interiorHardware;
+    newOrderDetailModel.unit = data[i].unit;
+    newOrderDetailModel.doorHight = data[i].doorHight;
+    newOrderDetailModel.height = data[i].height;
+    newOrderDetailModel.currectMeasurement = data[i].currectMeasurement;
+    newOrderDetailModel.images = arr;
+    newOrderDetailModel.temperedGlassType = data[i].temperedGlassType;
+    newOrderDetailModel.glassType = data[i].glassType;
+    newOrderDetailModel.designType = data[i].designType;
+    newOrderDetailModel.colorSelection = data[i].colorSelection;
+    newOrderDetailModel.styleSelection = data[i].styleSelection;
+    newOrderDetailModel.openingType = data[i].openingType;
+    newOrderDetailModel.openingDirection = data[i].openingDirection;
+    newOrderDetailModel.totalAmount = data[i].totalAmount;
+    newOrderDetailModel.openInGarage = data[i].openInGarage;
+    newOrderDetailModel.fireRated = data[i].fireRated;
+    newOrderDetailModel.core = data[i].core;
+    newOrderDetailModel.doorHeight = data[i].doorHeight;
+    newOrderDetailModel.doorWidth = data[i].doorWidth;
+    newOrderDetailModel.jamb = data[i].jamb;
+    newOrderDetailModel.doorStyle = data[i].doorStyle;
+    newOrderDetailModel.doorFinish = data[i].doorFinish;
+    newOrderDetailModel.doorOpening = data[i].doorOpening;
+    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
+    newOrderDetailModel.casing = data[i].casing;
+    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
+    newOrderDetailModel.hardware = data[i].hardware;
+    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
+    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
+    newOrderDetailModel.floor = data[i].floor;
+    newOrderDetailModel.gridSelection = data[i].gridSelection;
+    newOrderDetailModel.color = data[i].color;
+    newOrderDetailModel.jambWidthInches = data[i].jambWidthInches;
+    newOrderDetailModel.modelName = data[i].modelName;
+    newOrderDetailModel.units = data[i].units;
+    newOrderDetailModel.overallFrameWidth = data[i].overallFrameWidth;
+    newOrderDetailModel.overallFrameHeight = data[i].overallFrameHeight;
+    newOrderDetailModel.coreType = data[i].coreType;
+    newOrderDetailModel.doorThicknessInches = data[i].doorThicknessInches;
+    newOrderDetailModel.hinges = data[i].hinges;
+    newOrderDetailModel.isFireRated = data[i].isFireRated;
+    newOrderDetailModel.doorCasing = data[i].doorCasing;
+    newOrderDetailModel.useMyOwnCasing = data[i].useMyOwnCasing;
+    await newOrderDetailModel.save(function (err) {});
+    console.log("stored interior door successfully");
+
+  }
+}
+async function saveSlidingDoor(data, files, newOrderModel_id) {
+  for (let i = 0; i < data.length; i++) {
     let arr = getFileNameArrByItem(files, i);
 
     let newOrderDetailModel = new OrderDetailModel();
@@ -3172,134 +3332,18 @@ async function saveWindowOrder(data, files, newOrderModel_id) {
     newOrderDetailModel.floor = data[i].floor;
     newOrderDetailModel.gridSelection = data[i].gridSelection;
     newOrderDetailModel.color = data[i].color;
-    await newOrderDetailModel.save(function (err) {});
-    console.log("stored window successfully");
-  }
-}
-
-async function saveInteriorDoorOrderDetail(data, files, newOrderModel_id) {
-  for (let i = 0; i < data.length; i++) {
-    let arr = getFileNameArrByItem(files, i);
-
-    let newOrderDetailModel = new OrderDetailModel();
-    newOrderDetailModel.order = newOrderModel_id;
-    newOrderDetailModel.service = data[i].serviceId;
-    newOrderDetailModel.serviceName = data[i].serviceName;
-    newOrderDetailModel.label = data[i].label;
-    newOrderDetailModel.serviceType = data[i].serviceType;
-    newOrderDetailModel.property = data[i].propertyId;
-    newOrderDetailModel.handling = data[i].handling;
-    newOrderDetailModel.sTiles = data[i].sTiles;
-    newOrderDetailModel.sticking = data[i].sticking;
-    newOrderDetailModel.borePrep = data[i].borePrep;
-    newOrderDetailModel.bevel = data[i].bevel;
-    newOrderDetailModel.interiorHardware = data[i].interiorHardware;
-    newOrderDetailModel.preHanging = data[i].preHanging;
-    newOrderDetailModel.wallCondition = data[i].wallCondition;
-    newOrderDetailModel.carpetCut = data[i].carpetCut;
-    newOrderDetailModel.stopType = data[i].stopType;
-    newOrderDetailModel.bullNose = data[i].bullNose;
-    newOrderDetailModel.astragal = data[i].astragal;
-    newOrderDetailModel.flushBolts = data[i].flushBolts;
-    newOrderDetailModel.width = data[i].width;
-    newOrderDetailModel.height = data[i].height;
-    newOrderDetailModel.images = arr;
-    newOrderDetailModel.totalAmount = data[i].totalAmount;
-    newOrderDetailModel.modelName = data[i].modelName;
     newOrderDetailModel.jambWidthInches = data[i].jambWidthInches;
+    newOrderDetailModel.modelName = data[i].modelName;
+    newOrderDetailModel.units = data[i].units;
     newOrderDetailModel.unit = data[i].unit;
-    newOrderDetailModel.overallFrameHeight = data[i].overallFrameHeight;
     newOrderDetailModel.overallFrameWidth = data[i].overallFrameWidth;
+    newOrderDetailModel.overallFrameHeight = data[i].overallFrameHeight;
     newOrderDetailModel.coreType = data[i].coreType;
     newOrderDetailModel.doorThicknessInches = data[i].doorThicknessInches;
     newOrderDetailModel.hinges = data[i].hinges;
-    newOrderDetailModel.hingeType = data[i].hingeType;
-    newOrderDetailModel.hingeFinish = data[i].hingeFinish;
-    newOrderDetailModel.ballBearingHinges = data[i].ballBearingHinges;
-    newOrderDetailModel.hingeType = data[i].hingeType;
     newOrderDetailModel.isFireRated = data[i].isFireRated;
-    newOrderDetailModel.openInGarage = data[i].openInGarage;
-    newOrderDetailModel.fireRated = data[i].fireRated;
-    newOrderDetailModel.core = data[i].core;
-    newOrderDetailModel.doorHeight = data[i].doorHeight;
-    newOrderDetailModel.doorWidth = data[i].doorWidth;
-    newOrderDetailModel.jamb = data[i].jamb;
-    newOrderDetailModel.doorStyle = data[i].doorStyle;
-    newOrderDetailModel.doorFinish = data[i].doorFinish;
-    newOrderDetailModel.doorOpening = data[i].doorOpening;
-    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
-    newOrderDetailModel.casing = data[i].casing;
-    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
-    newOrderDetailModel.hardware = data[i].hardware;
-    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
-    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
-    newOrderDetailModel.floor = data[i].floor;
-    newOrderDetailModel.gridSelection = data[i].gridSelection;
-    newOrderDetailModel.color = data[i].color;
-    await newOrderDetailModel.save(function (err) {});
-    console.log("stored interior door successfully");
-
-  }
-}
-async function saveSlidingDoor(data, files, newOrderModel_id) {
-  for (let i = 0; i < data.length; i++) {
-    let arr = getFileNameArrByItem(files, i);
-
-    let newOrderDetailModel = new OrderDetailModel();
-    newOrderDetailModel.order = newOrderModel_id;
-    newOrderDetailModel.service = data[i].serviceId;
-    newOrderDetailModel.serviceName = data[i].serviceName;
-    newOrderDetailModel.label = data[i].label;
-    newOrderDetailModel.serviceType = data[i].serviceType;
-    newOrderDetailModel.property = data[i].propertyId;
-    newOrderDetailModel.handling = data[i].handling;
-    newOrderDetailModel.sTiles = data[i].sTiles;
-    newOrderDetailModel.sticking = data[i].sticking;
-    newOrderDetailModel.borePrep = data[i].borePrep;
-    newOrderDetailModel.bevel = data[i].bevel;
-    newOrderDetailModel.interiorHardware = data[i].interiorHardware;
-    newOrderDetailModel.preHanging = data[i].preHanging;
-    newOrderDetailModel.wallCondition = data[i].wallCondition;
-    newOrderDetailModel.carpetCut = data[i].carpetCut;
-    newOrderDetailModel.stopType = data[i].stopType;
-    newOrderDetailModel.bullNose = data[i].bullNose;
-    newOrderDetailModel.astragal = data[i].astragal;
-    newOrderDetailModel.flushBolts = data[i].flushBolts;
-    newOrderDetailModel.width = data[i].width;
-    newOrderDetailModel.height = data[i].height;
-    newOrderDetailModel.images = arr;
-    newOrderDetailModel.totalAmount = data[i].totalAmount;
-    newOrderDetailModel.modelName = data[i].modelName;
-    newOrderDetailModel.jambWidthInches = data[i].jambWidthInches;
-    newOrderDetailModel.unit = data[i].unit;
-    newOrderDetailModel.overallFrameHeight = data[i].overallFrameHeight;
-    newOrderDetailModel.overallFrameWidth = data[i].overallFrameWidth;
-    newOrderDetailModel.coreType = data[i].coreType;
-    newOrderDetailModel.doorThicknessInches = data[i].doorThicknessInches;
-    newOrderDetailModel.hinges = data[i].hinges;
-    newOrderDetailModel.hingeType = data[i].hingeType;
-    newOrderDetailModel.hingeFinish = data[i].hingeFinish;
-    newOrderDetailModel.ballBearingHinges = data[i].ballBearingHinges;
-    newOrderDetailModel.hingeType = data[i].hingeType;
-    newOrderDetailModel.isFireRated = data[i].isFireRated;
-    newOrderDetailModel.openInGarage = data[i].openInGarage;
-    newOrderDetailModel.fireRated = data[i].fireRated;
-    newOrderDetailModel.core = data[i].core;
-    newOrderDetailModel.doorHeight = data[i].doorHeight;
-    newOrderDetailModel.doorWidth = data[i].doorWidth;
-    newOrderDetailModel.jamb = data[i].jamb;
-    newOrderDetailModel.doorStyle = data[i].doorStyle;
-    newOrderDetailModel.doorFinish = data[i].doorFinish;
-    newOrderDetailModel.doorOpening = data[i].doorOpening;
-    newOrderDetailModel.doorHingColor = data[i].doorHingColor;
-    newOrderDetailModel.casing = data[i].casing;
-    newOrderDetailModel.useMyOwnTrim = data[i].useMyOwnTrim;
-    newOrderDetailModel.hardware = data[i].hardware;
-    newOrderDetailModel.useMyOwnDoorHandle = data[i].useMyOwnDoorHandle;
-    newOrderDetailModel.selectedRoomInfo = data[i].selectedRoomInfo;
-    newOrderDetailModel.floor = data[i].floor;
-    newOrderDetailModel.gridSelection = data[i].gridSelection;
-    newOrderDetailModel.color = data[i].color;
+    newOrderDetailModel.doorCasing = data[i].doorCasing;
+    newOrderDetailModel.useMyOwnCasing = data[i].useMyOwnCasing;
     await newOrderDetailModel.save(function (err) {});
     console.log("stored sliding door successfully");
 

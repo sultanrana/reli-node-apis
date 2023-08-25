@@ -44,7 +44,8 @@
     "qrcode": "^1.4.4",
     "randomstring": "^1.1.5",
     "request": "^2.88.2",
-    "stripe": "^11.6.0"
+    "stripe": "^11.6.0",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

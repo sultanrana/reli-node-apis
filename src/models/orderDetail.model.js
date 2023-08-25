@@ -148,6 +148,10 @@ const OrderDetail = new Schema(
       type: String,
       default: null,
     },
+    color: {
+      type: String,
+      default: null,
+    },
     styleSelection: {
       type: String,
       default: null,
@@ -187,6 +191,21 @@ const OrderDetail = new Schema(
       required: false,
       default: null,
     },
+    unit: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    doorHight: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    stackedWindow: {
+      type: String,
+      required: false,
+      default: null,
+    },
     overallFrameWidth: {
       type: String,
       required: false,
@@ -199,18 +218,18 @@ const OrderDetail = new Schema(
     },
     coreType: {
       type: String,
+      default: null,
       required: false,
-      default: null
     },
     doorThicknessInches: {
       type: String,
-      default: null,
       required: false,
+      default: null,
     },
     hinges: {
       type: String,
-      default: null,
       required: false,
+      default: null,
     },
     hingeType: {
       type: String,
@@ -226,6 +245,7 @@ const OrderDetail = new Schema(
     },
     openInGarage: {
       type: Boolean,
+      required: false,
       default: null,
     },
     isFireRated: {
@@ -297,6 +317,21 @@ const OrderDetail = new Schema(
       type: String,
       required: false,
       default: null,
+    },
+    doorCasing: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    useMyOwnCasing: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+      gridColor: {
+      type: String,
+      required: false,
+      default: false,
     },
   },
   { timestamps: true }
