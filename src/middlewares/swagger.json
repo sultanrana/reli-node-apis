@@ -377,7 +377,7 @@
             "description": "Place interior door order",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/placeWindowOrder"
+              "$ref": "#/definitions/placeInteriorDoorOrder"
             }
           }
         ],
@@ -399,7 +399,7 @@
             "description": "Place Sliding door order",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/placeWindowOrder"
+              "$ref": "#/definitions/placeSlidingDoorOrder"
             }
           }
         ],
@@ -676,77 +676,60 @@
             "name": "modelName",
             "in": "query",
             "description": "Model Name of door",
-            "required": true,
             "type": "string"
           },
           {
             "name": "jambWidthInches",
             "in": "query",
             "description": "Jamb Width of door",
-            "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "doorWidthInches",
             "in": "query",
             "description": "Door Width of door",
-            "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "unit",
             "in": "query",
             "description": "Unit",
-            "required": true,
             "type": "string"
           },
           {
             "name": "overallFrameWidth",
             "in": "query",
             "description": "Over all frame width",
-            "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "overallFrameHeight",
             "in": "query",
             "description": "Over all frame height",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "surface",
-            "in": "query",
-            "description": "surface",
-            "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "doorThicknessInches",
             "in": "query",
             "description": "Door thickness",
-            "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "coreType",
             "in": "query",
             "description": "Core type",
-            "required": true,
             "type": "string"
           },
           {
             "name": "hinges",
             "in": "query",
             "description": "Hinges",
-            "required": true,
             "type": "string"
           },
           {
             "name": "isFireRated",
             "in": "query",
             "description": "Is fire rated",
-            "required": true,
             "type": "boolean"
           }
         ],
@@ -1229,40 +1212,7 @@
           "type": "array",
           "items": {
             "properties": {
-              "modelName": {
-                "type": "string"
-              },
-              "jambWidthInches": {
-                "type": "string"
-              },
-              "unit": {
-                "type": "string"
-              },
-              "overallFrameHeight": {
-                "type": "string"
-              },
-              "overallFrameWidth": {
-                "type": "string"
-              },
-              "coreType": {
-                "type": "string"
-              },
-              "doorThicknessInches": {
-                "type": "string"
-              },
-              "hinges": {
-                "type": "string"
-              },
-              "isFireRated": {
-                "type": "boolean"
-              },
-              "openingType": {
-                "type": "string"
-              },
-              "width": {
-                "type": "string"
-              },
-              "height": {
+              "roomType": {
                 "type": "string"
               },
               "serviceId": {
@@ -1277,12 +1227,6 @@
               "propertyId": {
                 "type": "string"
               },
-              "stackedWindow": {
-                "type": "string"
-              },
-              "roomType": {
-                "type": "string"
-              },
               "temperedGlassType": {
                 "type": "string"
               },
@@ -1292,10 +1236,13 @@
               "color": {
                 "type": "string"
               },
-              "floorType": {
+              "windowType": {
                 "type": "string"
               },
-              "openingDirection": {
+              "stackedWindow": {
+                "type": "string"
+              },
+              "floorType": {
                 "type": "string"
               },
               "glassType": {
@@ -1304,17 +1251,200 @@
               "gridSelection": {
                 "type": "string"
               },
-              "doorHeight": {
-                "type": "string"
+              "width": {
+                "type": "integer"
               },
-              "doorWidth": {
-                "type": "string"
-              },
-              "lockAndKey": {
-                "type": "string"
+              "height": {
+                "type": "integer"
               },
               "gridColor": {
                 "type": "string"
+              },
+              "privacy": {
+                "type": "boolean"
+              },
+              "grid": {
+                "type": "boolean"
+              },
+              "temperedGlass": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "placeSlidingDoorOrder": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "cardHolderName": {
+          "type": "string"
+        },
+        "dateSelection": {
+          "type": "string"
+        },
+        "subTotalAmount": {
+          "type": "string"
+        },
+        "discountAmount": {
+          "type": "string"
+        },
+        "totalAmount": {
+          "type": "string"
+        },
+        "stripeCardId": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "arrayData": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "serviceId": {
+                "type": "string"
+              },
+              "serviceName": {
+                "type": "string"
+              },
+              "serviceType": {
+                "type": "string"
+              },
+              "propertyId": {
+                "type": "string"
+              },
+              "roomType": {
+                "type": "string"
+              },
+              "openingDirection": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              },
+              "doorType": {
+                "type": "string"
+              },
+              "floorType": {
+                "type": "string"
+              },
+              "gridSelection": {
+                "type": "string"
+              },
+              "width": {
+                "type": "integer"
+              },
+              "height": {
+                "type": "integer"
+              },
+              "gridColor": {
+                "type": "string"
+              },
+              "lockAndKey": {
+                "type": "boolean"
+              },
+              "grid": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "placeInteriorDoorOrder": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "cardHolderName": {
+          "type": "string"
+        },
+        "dateSelection": {
+          "type": "string"
+        },
+        "subTotalAmount": {
+          "type": "string"
+        },
+        "discountAmount": {
+          "type": "string"
+        },
+        "totalAmount": {
+          "type": "string"
+        },
+        "stripeCardId": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "arrayData": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "serviceId": {
+                "type": "string"
+              },
+              "serviceName": {
+                "type": "string"
+              },
+              "serviceType": {
+                "type": "string"
+              },
+              "propertyId": {
+                "type": "string"
+              },
+              "openingType": {
+                "type": "string"
+              },
+              "roomType": {
+                "type": "string"
+              },
+              "temperedGlassType": {
+                "type": "string"
+              },
+              "floorType": {
+                "type": "string"
+              },
+              "width": {
+                "type": "integer"
+              },
+              "height": {
+                "type": "integer"
+              },
+              "doorHeight": {
+                "type": "integer"
+              },
+              "doorWidth": {
+                "type": "integer"
+              },
+              "lockAndKey": {
+                "type": "boolean"
+              },
+              "isFireRated": {
+                "type": "boolean"
               },
               "casing": {
                 "type": "string"
@@ -1325,8 +1455,50 @@
               "hardware": {
                 "type": "string"
               },
+              "coreType": {
+                "type": "string"
+              },
               "hingeType": {
                 "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "openInGarage": {
+                "type": "boolean"
+              },
+              "jamb": {
+                "type": "string"
+              },
+              "jambWidthInches": {
+                "type": "integer"
+              },
+              "doorStyle": {
+                "type": "string"
+              },
+              "doorFinish": {
+                "type": "string"
+              },
+              "doorHingColor": {
+                "type": "string"
+              },
+              "useMyOwnTrim": {
+                "type": "boolean"
+              },
+              "useMyOwnDoorHandle": {
+                "type": "boolean"
+              },
+              "selectedRoomInfo": {
+                "type": "string"
+              },
+              "doorCasing": {
+                "type": "string"
+              },
+              "useMyOwnCasing": {
+                "type": "boolean"
+              },
+              "temperedGlass": {
+                "type": "boolean"
               }
             }
           }

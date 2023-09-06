@@ -795,14 +795,13 @@ export default {
     let stripeCardId = req.body.stripeCardId;
 
     try {
-      for (var i = 0; i < data.length; i++){
-        const { error, value } = placeOrderService.validatePlaceOrderWindowSchema(
-            data[i]
-        );
-        if (error && error.details) {
-          let result = makeApiResponce(error.message, 0, BAD_REQUEST);
-          return res.status(BAD_REQUEST).json(result);
-        }
+
+      const { error, value } = placeOrderService.validatePlaceOrderWindowSchema(
+          data
+      );
+      if (error && error.details) {
+        let result = makeApiResponce(error.message, 0, BAD_REQUEST);
+        return res.status(BAD_REQUEST).json(result);
       }
 
       console.log("making a stripe charge");
@@ -932,14 +931,12 @@ export default {
     let stripeCardId = req.body.stripeCardId;
 
     try {
-      for (var i = 0; i < data.length; i++){
-        const { error, value } = placeOrderService.validatePlaceOrderInteriorDoorSchema(
-            data[i]
-        );
-        if (error && error.details) {
-          let result = makeApiResponce(error.message, 0, BAD_REQUEST);
-          return res.status(BAD_REQUEST).json(result);
-        }
+      const { error, value } = placeOrderService.validatePlaceOrderInteriorDoorSchema(
+          data
+      );
+      if (error && error.details) {
+        let result = makeApiResponce(error.message, 0, BAD_REQUEST);
+        return res.status(BAD_REQUEST).json(result);
       }
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
@@ -1068,14 +1065,12 @@ export default {
     let stripeCardId = req.body.stripeCardId;
 
     try {
-      for (var i = 0; i < data.length; i++){
-        const { error, value } = placeOrderService.validatePlaceOrderSlidingDoorSchema(
-            data[i]
-        );
-        if (error && error.details) {
-          let result = makeApiResponce(error.message, 0, BAD_REQUEST);
-          return res.status(BAD_REQUEST).json(result);
-        }
+      const { error, value } = placeOrderService.validatePlaceOrderSlidingDoorSchema(
+          data
+      );
+      if (error && error.details) {
+        let result = makeApiResponce(error.message, 0, BAD_REQUEST);
+        return res.status(BAD_REQUEST).json(result);
       }
       console.log("making a stripe charge");
       const stripeCharge = await stripe.charges.create({
@@ -3213,7 +3208,15 @@ async function saveWindowOrder(data, files, newOrderModel_id) {
     newOrderDetailModel.stackedWindow = data[i].stackedWindow;
     newOrderDetailModel.doorCasing = data[i].doorCasing;
     newOrderDetailModel.useMyOwnCasing = data[i].useMyOwnCasing;
-    await newOrderDetailModel.save();
+    newOrderDetailModel.windowType = data[i].windowType;
+    newOrderDetailModel.gridColor = data[i].gridColor;
+    await newOrderDetailModel.save()
+        .then(savedDocument => {
+          console.log('Document saved:', savedDocument);
+        })
+        .catch(error => {
+          console.error('Error saving document:', error);
+        });;
     console.log("stored window successfully");
   }
 }
@@ -3279,8 +3282,15 @@ async function saveInteriorDoorOrderDetail(data, files, newOrderModel_id) {
     newOrderDetailModel.isFireRated = data[i].isFireRated;
     newOrderDetailModel.doorCasing = data[i].doorCasing;
     newOrderDetailModel.useMyOwnCasing = data[i].useMyOwnCasing;
-    await newOrderDetailModel.save(function (err) {});
-    console.log("stored interior door successfully");
+    await newOrderDetailModel.save()
+        .then(savedDocument => {
+      console.log('Document saved:', savedDocument);
+    })
+        .catch(error => {
+          console.error('Error saving document:', error);
+        });
+
+    console.log("stored interior door successfully" , newOrderDetailModel);
 
   }
 }
@@ -3344,7 +3354,15 @@ async function saveSlidingDoor(data, files, newOrderModel_id) {
     newOrderDetailModel.isFireRated = data[i].isFireRated;
     newOrderDetailModel.doorCasing = data[i].doorCasing;
     newOrderDetailModel.useMyOwnCasing = data[i].useMyOwnCasing;
-    await newOrderDetailModel.save(function (err) {});
+    newOrderDetailModel.windowType = data[i].windowType;
+    newOrderDetailModel.gridColor = data[i].gridColor;
+    await newOrderDetailModel.save()
+        .then(savedDocument => {
+          console.log('Document saved:', savedDocument);
+        })
+        .catch(error => {
+          console.error('Error saving document:', error);
+        });;
     console.log("stored sliding door successfully");
 
   }

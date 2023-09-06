@@ -35,7 +35,7 @@ export default {
             doorCasing: Joi.string(),
             useMyOwnCasing: Joi.boolean(),
         });
-        const schemas = Joi.array().items(schema);
+        const schemas = Joi.array().items(schema)
         const { error, value } = Joi.validate(body, schemas);
         if (error && error.details) {
             return { error };
@@ -64,7 +64,7 @@ export default {
             grid: Joi.boolean(),
             temperedGlass: Joi.boolean(),
         });
-        const schemas = Joi.array().items(schema);
+        const schemas = Joi.array().items(schema)
         const { error, value } = Joi.validate(body, schemas);
         if (error && error.details) {
             return { error };
@@ -89,7 +89,8 @@ export default {
             color: Joi.string(),
             grid: Joi.boolean(),
         });
-        const { error, value } = Joi.validate(body, schema);
+        const schemas = Joi.array().items(schema)
+        const { error, value } = Joi.validate(body, schemas);
         if (error && error.details) {
             return { error };
         }

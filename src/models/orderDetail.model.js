@@ -51,7 +51,7 @@ const OrderDetail = new Schema(
       required: false,
     },
     lockAndKey: {
-      type: String,
+      type: Boolean,
       required: false,
     },
     distanceFromGround: {
@@ -75,11 +75,11 @@ const OrderDetail = new Schema(
       default: null,
     },
     width: {
-      type: String,
+      type: Number,
       default: null,
     },
     height: {
-      type: String,
+      type: Number,
       default: null,
     },
     currectMeasurement: {
@@ -196,12 +196,12 @@ const OrderDetail = new Schema(
       required: false,
       default: null,
     },
-    doorHight: {
+    stackedWindow: {
       type: String,
       required: false,
       default: null,
     },
-    stackedWindow: {
+    windowType: {
       type: String,
       required: false,
       default: null,
@@ -222,7 +222,7 @@ const OrderDetail = new Schema(
       required: false,
     },
     doorThicknessInches: {
-      type: String,
+      type: Number,
       required: false,
       default: null,
     },
@@ -259,12 +259,12 @@ const OrderDetail = new Schema(
       default: null,
     },
     doorHeight: {
-      type: String,
+      type: Number,
       required: false,
       default: null,
     },
     doorWidth: {
-      type: String,
+      type: Number,
       required: false,
       default: null,
     },
@@ -328,8 +328,28 @@ const OrderDetail = new Schema(
       required: false,
       default: false,
     },
-      gridColor: {
+    gridColor: {
       type: String,
+      required: false,
+      default: null,
+    },
+    privacy: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    grid: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    safetyGlass: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    temperedGlass: {
+      type: Boolean,
       required: false,
       default: false,
     },
