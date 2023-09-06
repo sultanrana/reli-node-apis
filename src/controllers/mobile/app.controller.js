@@ -849,6 +849,19 @@ export default {
       activityLogModelData.user = req.currentUser._id;
       activityLogModelData.save();
 
+      const allContractors = await UserModel.find({ userType: 'contractor', fcmToken: { $ne: '' } });
+
+      for (const contractor of allContractors) {
+        const { fcmToken } = contractor;
+        if (!fcmToken) continue;
+        FCM.push_notification(
+          "New Window Order",
+          `New Window Order has been placed.`,
+          fcmToken,
+          12
+        );
+      }
+
       let result = makeApiResponce(
         "property Created Successfully",
         1,
@@ -983,6 +996,19 @@ export default {
       activityLogModelData.user = req.currentUser._id;
       activityLogModelData.save();
 
+      const allContractors = await UserModel.find({ userType: 'contractor', fcmToken: { $ne: '' } });
+
+      for (const contractor of allContractors) {
+        const { fcmToken } = contractor;
+        if (!fcmToken) continue;
+        FCM.push_notification(
+          "New Interior Order",
+          `New Interior Order has been placed.`,
+          fcmToken,
+          12
+        );
+      }
+
       let result = makeApiResponce(
         "property Created Successfully",
         1,
@@ -1116,6 +1142,19 @@ export default {
       activityLogModelData.order = newOrderModel._id;
       activityLogModelData.user = req.currentUser._id;
       activityLogModelData.save();
+
+      const allContractors = await UserModel.find({ userType: 'contractor', fcmToken: { $ne: '' } });
+
+      for (const contractor of allContractors) {
+        const { fcmToken } = contractor;
+        if (!fcmToken) continue;
+        FCM.push_notification(
+          "New Sliding Order",
+          `New Sliding Order has been placed.`,
+          fcmToken,
+          12
+        );
+      }
 
       let result = makeApiResponce(
         "property Created Successfully",
